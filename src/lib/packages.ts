@@ -15,18 +15,43 @@ export type AddonId =
   | "cover-letter"
   | "salary-negotiation";
 
+export const comparisonFeatures = [
+  { id: "writtenCv", label: "Professionally written CV" },
+  { id: "ats", label: "ATS-friendly formatting" },
+  { id: "wordPdf", label: "Word + PDF delivery" },
+  { id: "jobAlerts", label: "Free tailored job alerts" },
+  { id: "guarantee", label: "Satisfaction guarantee" },
+  { id: "writerContact", label: "Direct writer contact" },
+  { id: "priorityTurnaround", label: "Priority turnaround" },
+  { id: "internationalFormat", label: "International résumé" },
+] as const;
+
+export type ComparisonFeatureId = (typeof comparisonFeatures)[number]["id"];
+
+export type PackageTone = "gold" | "navy" | "charcoal" | "ink" | "steel";
+
 export type CatalogPackage = {
   id: PackageId;
   name: string;
+  headerName: string;
   price: number;
   turnaroundDays: number;
   turnaroundLabel: string;
+  africaOnly: boolean;
+  regionLabel?: string;
   audience: string;
   summary: string;
   included: string[];
+  features: ComparisonFeatureId[];
+  tone: PackageTone;
   popular?: boolean;
   category: "core" | "standalone" | "return";
 };
+
+export const africaOnlyLabel = "Africa countries only";
+export const africaOnlyHeaderLabel = "Africa only";
+export const internationalRegionLabel =
+  "Works in Canada, Germany, Ireland, Australia, New\u00a0Zealand, Dubai, America\u00a0(USA), UK, etc.";
 
 export type CatalogAddon = {
   id: AddonId;
@@ -40,9 +65,13 @@ export const packages: CatalogPackage[] = [
   {
     id: "fresh-graduate",
     name: "Fresh Graduate CV",
+    headerName: "Graduate",
+    tone: "navy",
+    features: ["writtenCv", "ats", "wordPdf", "jobAlerts", "guarantee"],
     price: 950,
     turnaroundDays: 10,
     turnaroundLabel: "10 working days",
+    africaOnly: true,
     audience: "New graduates and first-job applicants who need a strong first impression.",
     summary:
       "A professionally written CV that turns academic work, internships, and campus experience into a recruiter-ready story.",
@@ -58,9 +87,13 @@ export const packages: CatalogPackage[] = [
   {
     id: "professional",
     name: "Professional CV",
+    headerName: "Professional",
+    tone: "gold",
+    features: ["writtenCv", "ats", "wordPdf", "jobAlerts", "guarantee", "writerContact"],
     price: 1200,
     turnaroundDays: 7,
     turnaroundLabel: "7 working days",
+    africaOnly: true,
     audience: "Working professionals ready to move roles, industries, or seniority.",
     summary:
       "Our most requested package. A specialist writer positions your experience for the next rung on your career ladder.",
@@ -77,9 +110,13 @@ export const packages: CatalogPackage[] = [
   {
     id: "executive",
     name: "Executive CV",
+    headerName: "Executive",
+    tone: "charcoal",
+    features: ["writtenCv", "ats", "wordPdf", "jobAlerts", "priorityTurnaround"],
     price: 1500,
     turnaroundDays: 5,
     turnaroundLabel: "5 working days",
+    africaOnly: true,
     audience: "Senior managers and executives who need board-level presence.",
     summary:
       "Leadership narrative, commercial impact, and a document that holds up in executive search and board processes.",
@@ -95,9 +132,14 @@ export const packages: CatalogPackage[] = [
   {
     id: "international",
     name: "International Résumé",
+    headerName: "International",
+    tone: "ink",
+    features: ["writtenCv", "wordPdf", "priorityTurnaround", "internationalFormat"],
     price: 3000,
     turnaroundDays: 4,
     turnaroundLabel: "4 working days",
+    africaOnly: false,
+    regionLabel: internationalRegionLabel,
     audience: "Candidates targeting roles outside South Africa or with global employers.",
     summary:
       "An internationally formatted résumé aligned to overseas hiring norms, with guidance for global applications.",
@@ -113,9 +155,13 @@ export const packages: CatalogPackage[] = [
   {
     id: "cv-only",
     name: "CV Only",
+    headerName: "CV Only",
+    tone: "steel",
+    features: ["writtenCv", "ats", "wordPdf", "guarantee"],
     price: 750,
     turnaroundDays: 10,
     turnaroundLabel: "Up to 10 working days",
+    africaOnly: true,
     audience: "Anyone who wants expert writing without a bundle.",
     summary:
       "If you don’t want a bundle, we always accommodate individual service options. Professional CV writing on its own.",
@@ -130,9 +176,13 @@ export const packages: CatalogPackage[] = [
   {
     id: "return-standard",
     name: "Return Client — Standard Edit",
+    headerName: "Standard Edit",
+    tone: "navy",
+    features: ["writtenCv", "ats", "wordPdf"],
     price: 750,
-    turnaroundDays: 7,
-    turnaroundLabel: "7 working days",
+    turnaroundDays: 5,
+    turnaroundLabel: "5 working days",
+    africaOnly: true,
     audience: "Returning clients who need a standard update to an existing Creative CV.",
     summary:
       "A considered edit of your existing Creative CV for a new role, promotion, or refreshed positioning.",
@@ -146,9 +196,13 @@ export const packages: CatalogPackage[] = [
   {
     id: "return-express",
     name: "Return Client — Express Edit",
+    headerName: "Express Edit",
+    tone: "charcoal",
+    features: ["writtenCv", "ats", "wordPdf", "priorityTurnaround"],
     price: 1000,
-    turnaroundDays: 3,
-    turnaroundLabel: "Express turnaround",
+    turnaroundDays: 2,
+    turnaroundLabel: "2 working days",
+    africaOnly: true,
     audience: "Returning clients who need a faster refresh.",
     summary:
       "Priority editing when you need an updated CV back quickly — subject to writer availability.",
@@ -206,8 +260,22 @@ export const addons: CatalogAddon[] = [
 
 export const generatorPrice = 350;
 
+export const primaryCvPackages = packages.filter(
+  (item) => item.category === "core" || item.category === "standalone",
+);
+
+export const returnClientPackages = packages.filter((item) => item.category === "return");
+
+export function packageHasFeature(pkg: CatalogPackage, featureId: ComparisonFeatureId) {
+  return pkg.features.includes(featureId);
+}
+
 export function getPackage(id: string) {
   return packages.find((item) => item.id === id);
+}
+
+export function packageOrderHref(id: PackageId) {
+  return `/packages?package=${id}#order`;
 }
 
 export function getAddon(id: string) {

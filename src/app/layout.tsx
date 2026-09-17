@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Newsreader } from "next/font/google";
+import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { HideOnAdmin } from "@/components/layout/hide-on-admin";
+import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-const instrument = Instrument_Sans({
+const sourceSans = Source_Sans_3({
   subsets: ["latin"],
-  variable: "--font-instrument",
+  variable: "--font-source-sans",
   display: "swap",
 });
 
-const newsreader = Newsreader({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-newsreader",
+  variable: "--font-playfair",
   display: "swap",
-  styles: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -25,6 +26,10 @@ export const metadata: Metadata = {
     template: `%s · ${site.name}`,
   },
   description: site.description,
+  icons: {
+    icon: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
   openGraph: {
     title: `${site.name} — Professional CV Writing Services in South Africa`,
     description: site.description,
@@ -36,11 +41,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-ZA" className={`${instrument.variable} ${newsreader.variable}`}>
+    <html lang="en-ZA" className={`${sourceSans.variable} ${playfair.variable}`}>
       <body className="min-h-screen bg-paper font-sans text-ink antialiased">
-        <Header />
+        <HideOnAdmin>
+          <Header />
+        </HideOnAdmin>
         <main>{children}</main>
-        <Footer />
+        <HideOnAdmin>
+          <Footer />
+          <WhatsAppButton />
+        </HideOnAdmin>
       </body>
     </html>
   );

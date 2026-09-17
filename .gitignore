@@ -32,6 +32,13 @@ yarn-error.log*
 .env*
 !.env.example
 
+# local admin activity store
+.data/
+
+# local scratch / screenshots
+/tmp/
+/.tmp-screens/
+
 # vercel
 .vercel
 

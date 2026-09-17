@@ -16,6 +16,7 @@ export const site = {
   rating: "5.0/5",
   googleRating: "4.9/5",
   trustpilot: "4.7",
+  whatsappHref: "https://wa.me/27746502580?text=Hi%20Creative%20CV%2C%20I%20would%20like%20to%20enquire%20about%20your%20services.",
 } as const;
 
 export const nav = [
