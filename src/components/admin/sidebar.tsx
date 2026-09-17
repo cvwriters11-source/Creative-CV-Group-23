@@ -55,7 +55,7 @@ export function AdminSidebar({ email }: { email: string }) {
         </div>
 
         <div className="relative z-10 h-full overflow-y-auto px-3 py-3">
-          <div className="rounded-xl bg-teal-500 p-1.5 shadow-sm">
+          <div className="rounded-xl bg-blue-600 p-1.5 shadow-sm">
             <div className="grid grid-cols-2 gap-1 min-[520px]:grid-cols-4 lg:grid-cols-2">
               {links.map((item) => {
                 const active = isActivePath(pathname, item.href, item.aliases);
@@ -83,7 +83,7 @@ export function AdminSidebar({ email }: { email: string }) {
 
       <div className="relative z-10 shrink-0 border-t border-white/10 p-4">
         <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/5 px-3 py-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-500 text-sm font-semibold text-white">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
             {email.slice(0, 1).toUpperCase()}
           </span>
           <div className="min-w-0">

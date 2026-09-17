@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { defaultPackageServiceMap, defaultPackageServices, packages } from "@/lib/packages";
 import type {
   ActivityItem,
   AdminApplication,
@@ -13,6 +14,7 @@ import type {
   ContactStatus,
   GeneratorEvent,
   OrderStatus,
+  PackageService,
 } from "@/lib/admin/types";
 
 const emptyStore = (): AdminStore => ({
@@ -86,6 +88,8 @@ async function readFromDisk(): Promise<AdminStore> {
       writers: parsed.writers ?? [],
       generatorEvents: parsed.generatorEvents ?? [],
       activity: parsed.activity ?? [],
+      packageServices: parsed.packageServices,
+      packageServiceMap: parsed.packageServiceMap,
     };
   } catch {
     return emptyStore();
@@ -111,6 +115,11 @@ export async function readAdminStore() {
   return enqueue(() => readFromDisk());
 }
 
+export async function getAdminOrder(id: string) {
+  const store = await readAdminStore();
+  return store.orders.find((order) => order.id === id) ?? null;
+}
+
 export async function mutateAdminStore<T>(fn: (store: AdminStore) => T | Promise<T>): Promise<T> {
   return enqueue(async () => {
     const store = await readFromDisk();
@@ -129,11 +138,21 @@ export function pushActivity(store: AdminStore, item: Omit<ActivityItem, "id" | 
   store.activity = store.activity.slice(0, 80);
 }
 
-export async function recordOrder(input: Omit<AdminOrder, "id" | "createdAt">) {
+export function nextRevampOrderNumber(orders: AdminOrder[]) {
+  let highest = 0;
+  for (const order of orders) {
+    const match = /^Revamp(\d+)$/i.exec(order.orderNumber ?? "");
+    if (match) highest = Math.max(highest, Number(match[1]));
+  }
+  return `Revamp${String(highest + 1).padStart(3, "0")}`;
+}
+
+export async function recordOrder(input: Omit<AdminOrder, "id" | "createdAt" | "orderNumber">) {
   return mutateAdminStore((store) => {
     const order: AdminOrder = {
       ...input,
       id: crypto.randomUUID(),
+      orderNumber: nextRevampOrderNumber(store.orders),
       createdAt: new Date().toISOString(),
     };
     store.orders.unshift(order);
@@ -345,5 +364,26 @@ export async function recordGeneratorEvent(input: Omit<GeneratorEvent, "id" | "c
       href: "/admin/generator",
     });
     return event;
+  });
+}
+
+export async function getPackageServiceCatalog() {
+  const store = await readAdminStore();
+  const defaults = defaultPackageServices();
+  const saved = store.packageServices ?? [];
+  const custom = saved.filter((item) => item.custom || !defaults.some((feature) => feature.id === item.id));
+  const services = [...defaults, ...custom.filter((item) => item.custom)];
+  const map = { ...defaultPackageServiceMap(), ...(store.packageServiceMap ?? {}) };
+  for (const pkg of packages) {
+    if (!map[pkg.id]) map[pkg.id] = [...pkg.features];
+  }
+  return { services, map };
+}
+
+export async function savePackageServiceCatalog(input: { services: PackageService[]; map: Record<string, string[]> }) {
+  return mutateAdminStore((store) => {
+    store.packageServices = input.services;
+    store.packageServiceMap = input.map;
+    return { services: store.packageServices, map: store.packageServiceMap };
   });
 }

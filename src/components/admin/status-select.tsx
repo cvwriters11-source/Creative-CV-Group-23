@@ -2,17 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { cn } from "@/lib/cn";
 
 export function StatusSelect({
   endpoint,
   id,
   value,
   options,
+  className,
 }: {
   endpoint: string;
   id: string;
   value: string;
   options: { value: string; label: string }[];
+  className?: string;
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState(value);
@@ -32,7 +35,7 @@ export function StatusSelect({
 
   return (
     <select
-      className="field py-1.5 text-sm"
+      className={cn("field py-1.5 text-sm", className)}
       value={current}
       disabled={saving}
       onChange={(event) => onChange(event.target.value)}

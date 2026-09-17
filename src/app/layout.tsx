@@ -3,6 +3,7 @@ import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { HideOnAdmin } from "@/components/layout/hide-on-admin";
+import { UnregisterStaleWorkers } from "@/components/layout/unregister-stale-workers";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -41,8 +42,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-ZA" className={`${sourceSans.variable} ${playfair.variable}`}>
-      <body className="min-h-screen bg-paper font-sans text-ink antialiased">
+    <html lang="en-ZA" className={`${sourceSans.variable} ${playfair.variable}`} suppressHydrationWarning>
+      <body className="min-h-screen bg-paper font-sans text-ink antialiased" suppressHydrationWarning>
+        <UnregisterStaleWorkers />
         <HideOnAdmin>
           <Header />
         </HideOnAdmin>

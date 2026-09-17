@@ -42,7 +42,7 @@ export type CatalogPackage = {
   audience: string;
   summary: string;
   included: string[];
-  features: ComparisonFeatureId[];
+  features: string[];
   tone: PackageTone;
   popular?: boolean;
   category: "core" | "standalone" | "return";
@@ -266,16 +266,26 @@ export const primaryCvPackages = packages.filter(
 
 export const returnClientPackages = packages.filter((item) => item.category === "return");
 
-export function packageHasFeature(pkg: CatalogPackage, featureId: ComparisonFeatureId) {
+export function packageHasFeature(pkg: CatalogPackage, featureId: string) {
   return pkg.features.includes(featureId);
+}
+
+export function defaultPackageServices() {
+  return comparisonFeatures.map((feature) => ({ id: feature.id, label: feature.label, custom: false }));
+}
+
+export function defaultPackageServiceMap() {
+  return Object.fromEntries(packages.map((item) => [item.id, [...item.features]])) as Record<string, string[]>;
 }
 
 export function getPackage(id: string) {
   return packages.find((item) => item.id === id);
 }
 
-export function packageOrderHref(id: PackageId) {
-  return `/packages?package=${id}#order`;
+export function packageOrderHref(id: PackageId, addonIds: AddonId[] = []) {
+  const params = new URLSearchParams({ package: id });
+  if (addonIds.length) params.set("addons", addonIds.join(","));
+  return `/packages/order?${params.toString()}`;
 }
 
 export function getAddon(id: string) {

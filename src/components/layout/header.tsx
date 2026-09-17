@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Briefcase, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { BrandLogo } from "@/components/layout/brand-logo";
 import { nav } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
@@ -13,15 +13,12 @@ function isActive(pathname: string, href: string) {
 }
 
 const navButtonBase =
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border font-bold tracking-tight transition-colors focus-visible:outline-2 focus-visible:outline-offset-2";
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border text-sm font-extrabold tracking-tight transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:text-[15px] lg:text-base";
 
 const navButtonIdle =
-  "border-accent bg-white text-[#020617] hover:border-accent-hover hover:bg-accent/5 hover:text-[#020617]";
+  "border-transparent bg-accent text-white hover:bg-accent-hover";
 
-const navButtonActive = "border-accent bg-accent text-white";
-
-const registerButton =
-  "inline-flex items-center justify-center whitespace-nowrap rounded-full bg-brand font-bold text-white transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+const navButtonActive = "border-transparent bg-brand text-white ring-2 ring-white/70";
 
 export function Header() {
   const pathname = usePathname();
@@ -48,72 +45,50 @@ export function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-blue-100 bg-white [color-scheme:light]">
+    <header className="sticky top-0 z-50 border-b border-blue-100 bg-white">
       <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:px-5 lg:min-h-24 lg:px-8">
         <Link href="/" className="flex shrink-0 items-center" onClick={() => setOpen(false)}>
-          <Image
-            src="/logo.jpg"
-            alt="Creative-CV Group of Recruiters"
-            width={720}
-            height={480}
-            className="h-16 w-auto object-contain object-left lg:h-[5.5rem]"
-            priority
-          />
+          <BrandLogo className="h-12 w-auto object-contain object-left sm:h-14 lg:h-16" />
         </Link>
 
-        <div className="hidden min-w-0 flex-1 items-center justify-end gap-1.5 sm:flex sm:flex-wrap lg:flex-nowrap lg:gap-2">
-          <nav className="flex flex-wrap items-center justify-end gap-1.5 text-sm md:gap-2 md:text-base lg:flex-1 lg:justify-center">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  navButtonBase,
-                  "px-2.5 py-1.5 md:px-3 lg:px-4 lg:py-2",
-                  isActive(pathname, item.href) ? navButtonActive : navButtonIdle,
-                )}
-              >
-                {item.href === "/jobs" ? <Briefcase size={16} className="hidden lg:inline" /> : null}
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
-            {adminLoggedIn ? (
-              <Link
-                href="/admin"
-                className={cn(
-                  navButtonBase,
-                  "px-2.5 py-1.5 text-sm md:px-3 md:text-base lg:px-4 lg:py-2",
-                  pathname === "/admin" || (pathname.startsWith("/admin/") && pathname !== "/admin/login")
-                    ? navButtonActive
-                    : navButtonIdle,
-                )}
-              >
-                Admin
-              </Link>
-            ) : null}
+        <nav className="hidden min-w-0 flex-1 items-center justify-end gap-1 sm:flex sm:flex-nowrap md:gap-1.5 lg:justify-center lg:gap-2">
+          {nav.map((item) => (
             <Link
-              href="/auth/login"
+              key={item.href}
+              href={item.href}
               className={cn(
                 navButtonBase,
-                "px-2.5 py-1.5 text-sm md:px-3 md:text-base lg:px-4 lg:py-2",
-                pathname.startsWith("/auth/login") ? navButtonActive : navButtonIdle,
+                "shrink-0 px-2.5 py-1.5 md:px-3 lg:px-4 lg:py-2",
+                isActive(pathname, item.href) ? navButtonActive : navButtonIdle,
               )}
             >
-              Sign In
+              {item.label}
             </Link>
-            <Link
-              href="/auth/register/job-seeker"
-              className={cn(
-                registerButton,
-                "px-3 py-1.5 text-sm md:px-4 md:text-base lg:px-5 lg:py-2",
-              )}
-            >
-              Register
-            </Link>
-          </div>
-        </div>
+          ))}
+          <Link
+            href={adminLoggedIn ? "/admin" : "/auth/login"}
+            className={cn(
+              navButtonBase,
+              "shrink-0 px-2.5 py-1.5 md:px-3 lg:px-4 lg:py-2",
+              pathname.startsWith("/auth/login") ||
+                (adminLoggedIn && pathname.startsWith("/admin") && pathname !== "/admin/login")
+                ? navButtonActive
+                : navButtonIdle,
+            )}
+          >
+            Sign In
+          </Link>
+          <Link
+            href="/auth/register/job-seeker"
+            className={cn(
+              navButtonBase,
+              "shrink-0 px-3 py-1.5 md:px-4 lg:px-5 lg:py-2",
+              pathname.startsWith("/auth/register") ? navButtonActive : navButtonIdle,
+            )}
+          >
+            Register
+          </Link>
+        </nav>
 
         <button
           type="button"
@@ -135,7 +110,7 @@ export function Header() {
                 href={item.href}
                 className={cn(
                   navButtonBase,
-                  "w-full px-4 py-3 text-base",
+                  "w-full px-4 py-3 text-base font-extrabold",
                   isActive(pathname, item.href) ? navButtonActive : navButtonIdle,
                 )}
                 onClick={() => setOpen(false)}
@@ -143,25 +118,15 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            {adminLoggedIn ? (
-              <Link
-                href="/admin"
-                className={cn(
-                  navButtonBase,
-                  "w-full px-4 py-3 text-base",
-                  pathname.startsWith("/admin") && pathname !== "/admin/login" ? navButtonActive : navButtonIdle,
-                )}
-                onClick={() => setOpen(false)}
-              >
-                Admin
-              </Link>
-            ) : null}
             <Link
-              href="/auth/login"
+              href={adminLoggedIn ? "/admin" : "/auth/login"}
               className={cn(
                 navButtonBase,
                 "w-full px-4 py-3 text-base",
-                pathname.startsWith("/auth/login") ? navButtonActive : navButtonIdle,
+                pathname.startsWith("/auth/login") ||
+                  (adminLoggedIn && pathname.startsWith("/admin") && pathname !== "/admin/login")
+                  ? navButtonActive
+                  : navButtonIdle,
               )}
               onClick={() => setOpen(false)}
             >
@@ -169,7 +134,11 @@ export function Header() {
             </Link>
             <Link
               href="/auth/register/job-seeker"
-              className={cn(registerButton, "w-full px-4 py-3.5 text-base")}
+              className={cn(
+                navButtonBase,
+                "w-full px-4 py-3.5 text-base",
+                pathname.startsWith("/auth/register") ? navButtonActive : navButtonIdle,
+              )}
               onClick={() => setOpen(false)}
             >
               Register

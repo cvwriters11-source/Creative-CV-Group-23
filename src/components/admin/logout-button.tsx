@@ -11,7 +11,7 @@ export function AdminLogoutButton() {
       className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-500"
       onClick={async () => {
         await fetch("/api/admin/logout", { method: "POST" });
-        router.push("/admin/login");
+        router.push("/auth/login");
         router.refresh();
       }}
     >

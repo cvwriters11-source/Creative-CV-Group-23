@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLogo } from "@/components/layout/brand-logo";
 import { site } from "@/lib/site";
 
 const columns = [
@@ -43,21 +43,13 @@ const columns = [
 ];
 
 export function Footer() {
-  const year = new Date().getFullYear();
-
   return (
     <footer className="bg-charcoal text-ink">
       <div className="brand-bar" aria-hidden />
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
         <div>
           <Link href="/" className="inline-flex rounded-lg bg-white px-2 py-1.5">
-            <Image
-              src="/logo.jpg"
-              alt="Creative-CV Group of Recruiters"
-              width={720}
-              height={480}
-              className="h-11 w-auto object-contain"
-            />
+            <BrandLogo className="h-11 w-auto object-contain" />
           </Link>
           <h2 className="mt-4 text-base font-bold text-accent">Creative-CV</h2>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink/70">
@@ -102,7 +94,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-sm text-ink/60 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <p>
-            © {year} {site.name}. All rights reserved.
+            © 2026 {site.name}. All rights reserved.
           </p>
           <p>
             Made with <span className="text-accent">❤️</span> in {site.location}

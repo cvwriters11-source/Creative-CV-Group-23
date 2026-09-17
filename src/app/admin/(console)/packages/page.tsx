@@ -1,15 +1,28 @@
 import { formatOpsZar } from "@/lib/admin/dashboard";
+import { PackageServicesManager } from "@/components/admin/package-services-manager";
+import { getPackageServiceCatalog } from "@/lib/admin/store";
 import { addons, packages } from "@/lib/packages";
 
 export const metadata = { title: "Packages" };
 
-export default function AdminPackagesPage() {
+export default async function AdminPackagesPage() {
+  const catalog = await getPackageServiceCatalog();
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-slate-900">Packages</h1>
-      <p className="mt-1 text-sm text-slate-500">Public catalogue prices. These are not revenue until an order is paid.</p>
+      <p className="mt-1 text-sm text-slate-500">
+        Switch services on or off per package, or add new ones. Public cards update as soon as you save.
+      </p>
 
-      <div className="mt-6 overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+      <div className="mt-6">
+        <PackageServicesManager initial={catalog} />
+      </div>
+
+      <h2 className="mt-10 text-lg font-semibold text-slate-900">Catalogue prices</h2>
+      <p className="mt-1 text-sm text-slate-500">These are not revenue until an order is paid.</p>
+
+      <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
         <table className="min-w-full text-left text-sm">
           <thead>
             <tr className="text-xs font-semibold uppercase tracking-wide text-slate-400">

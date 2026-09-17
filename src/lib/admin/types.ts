@@ -9,7 +9,10 @@ export type JobSource = "seed" | "admin" | "recruiter";
 export type AdminOrder = {
   id: string;
   reference: string;
+  orderNumber: string;
   fullName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
   packageId: string;
@@ -19,6 +22,8 @@ export type AdminOrder = {
   status: OrderStatus;
   goals: string;
   cvFileName: string;
+  photoFileName?: string;
+  extraFileName?: string;
   paymentConfigured: boolean;
   createdAt: string;
   completedAt?: string;
@@ -94,6 +99,12 @@ export type ActivityItem = {
   createdAt: string;
 };
 
+export type PackageService = {
+  id: string;
+  label: string;
+  custom?: boolean;
+};
+
 export type AdminStore = {
   orders: AdminOrder[];
   contacts: AdminContact[];
@@ -104,4 +115,6 @@ export type AdminStore = {
   writers: AdminWriter[];
   generatorEvents: GeneratorEvent[];
   activity: ActivityItem[];
+  packageServices?: PackageService[];
+  packageServiceMap?: Record<string, string[]>;
 };

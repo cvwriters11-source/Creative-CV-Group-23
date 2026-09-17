@@ -82,10 +82,12 @@ export function PackageCard({
   pkg,
   selected = false,
   onSelect,
+  services = comparisonFeatures,
 }: {
   pkg: CatalogPackage;
   selected?: boolean;
   onSelect?: (id: PackageId) => void;
+  services?: readonly { id: string; label: string }[];
 }) {
   const theme = tones[pkg.tone] ?? tones.navy;
   const featured = Boolean(pkg.popular);
@@ -126,13 +128,15 @@ export function PackageCard({
             </div>
             <div
               className={cn(
-                "flex size-[5.15rem] shrink-0 flex-col items-center justify-center rounded-full ring-2",
+                "flex size-[5.15rem] shrink-0 items-center justify-center rounded-full ring-2",
                 "bg-white/20 text-white ring-white/75",
               )}
               aria-label={`${pkg.name} price R${pkg.price}`}
             >
-              <span className="text-xs font-semibold leading-none opacity-90">R</span>
-              <span className="mt-0.5 text-2xl font-bold leading-none tracking-tight">{pkg.price}</span>
+              <span className="flex items-center font-bold leading-none tracking-tight">
+                <span className="text-2xl">R</span>
+                <span className="text-2xl">{pkg.price}</span>
+              </span>
             </div>
           </div>
           {pkg.regionLabel ? (
@@ -143,7 +147,7 @@ export function PackageCard({
 
       <div className="flex flex-1 flex-col px-6 pb-6 pt-1">
         <ul className="space-y-2.5">
-          {comparisonFeatures.map((feature) => {
+          {services.map((feature) => {
             const included = packageHasFeature(pkg, feature.id);
             return (
               <li key={feature.id} className="flex items-start gap-2.5">
@@ -174,15 +178,23 @@ export function PackagePricingGrid({
   items,
   selectedId,
   onSelect,
+  services,
 }: {
   items: CatalogPackage[];
   selectedId?: PackageId;
   onSelect?: (id: PackageId) => void;
+  services?: readonly { id: string; label: string }[];
 }) {
   return (
     <div className="grid grid-cols-1 items-stretch gap-5 min-[717px]:grid-cols-2 lg:grid-cols-4 lg:items-end">
       {items.map((pkg) => (
-        <PackageCard key={pkg.id} pkg={pkg} selected={selectedId === pkg.id} onSelect={onSelect} />
+        <PackageCard
+          key={pkg.id}
+          pkg={pkg}
+          selected={selectedId === pkg.id}
+          onSelect={onSelect}
+          services={services}
+        />
       ))}
     </div>
   );

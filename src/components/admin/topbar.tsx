@@ -23,11 +23,11 @@ export function AdminTopbar({ pendingCount }: { pendingCount: number }) {
   const title = titles.find((item) => item.match(pathname))?.title ?? "Admin";
 
   return (
-    <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 lg:px-8">
-      <h1 className="text-base font-semibold text-slate-800">{title}</h1>
+    <header className="flex items-center justify-between border-b border-blue-400/20 bg-[#071422]/80 px-4 py-3 backdrop-blur-md lg:px-8">
+      <h1 className="text-base font-semibold text-white">{title}</h1>
       <Link
         href="/admin/orders"
-        className="relative rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+        className="relative rounded-full p-2 text-sky-300 hover:bg-white/10 hover:text-white"
         aria-label={pendingCount ? `${pendingCount} pending orders` : "Orders"}
       >
         <Bell size={18} />

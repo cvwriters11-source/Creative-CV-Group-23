@@ -10,11 +10,14 @@ export async function middleware(request: NextRequest) {
     if (session) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
-    return NextResponse.next();
+    const login = new URL("/auth/login", request.url);
+    const next = request.nextUrl.searchParams.get("next");
+    if (next) login.searchParams.set("next", next);
+    return NextResponse.redirect(login);
   }
 
   if (!session) {
-    const login = new URL("/admin/login", request.url);
+    const login = new URL("/auth/login", request.url);
     login.searchParams.set("next", pathname);
     return NextResponse.redirect(login);
   }

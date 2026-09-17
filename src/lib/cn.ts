@@ -3,9 +3,7 @@ export function cn(...classes: Array<string | false | null | undefined>) {
 }
 
 export function formatZar(amount: number) {
-  return new Intl.NumberFormat("en-ZA", {
-    style: "currency",
-    currency: "ZAR",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  const n = Math.round(Number(amount) || 0);
+  const grouped = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return `${n < 0 ? "-" : ""}R ${grouped}`;
 }

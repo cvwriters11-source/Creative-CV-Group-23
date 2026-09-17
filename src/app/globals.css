@@ -309,42 +309,197 @@ h2 {
 }
 
 .admin-ops {
-  color-scheme: light;
-  --color-ink: #0f172a;
-  --color-ink-soft: #64748b;
-  --color-paper: #ffffff;
-  --color-paper-deep: #f8fafc;
-  --color-wash: #f4f7fb;
-  --color-line: #e2e8f0;
-  --color-line-brand: #cbd5e1;
-  --color-accent: #0d9488;
-  --color-accent-hover: #0f766e;
-  --color-accent-soft: #ccfbf1;
-  --color-gold: #14b8a6;
-  color: #0f172a;
-  background: #f4f7fb;
+  color-scheme: dark;
+  --color-ink: #f8fafc;
+  --color-ink-soft: #94a3b8;
+  --color-paper: #0c2344;
+  --color-paper-deep: #07182d;
+  --color-wash: #05101c;
+  --color-line: #1e3a5f;
+  --color-line-brand: #2563eb;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --color-accent-soft: #122a4a;
+  --color-gold: #38bdf8;
+  color: #e2e8f0;
+  background:
+    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(37, 99, 235, 0.38), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(14, 165, 233, 0.16), transparent 50%),
+    #05101c;
 }
 
 .admin-ops h1,
 .admin-ops h2 {
   font-family: var(--font-sans);
+  color: #f8fafc;
 }
 
 .admin-ops .card-surface {
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, #0e2a52 0%, #07182d 100%);
+  border: 1px solid rgba(59, 130, 246, 0.28);
   border-radius: 1rem;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 16px 40px rgba(2, 8, 24, 0.35);
 }
 
 .admin-ops .field {
-  border: 1px solid #dbe3ee;
-  background: #fff;
-  color: #0f172a;
+  border: 1px solid #1e4d8c;
+  background: #071422;
+  color: #f8fafc;
 }
 
-.admin-ops .kicker {
-  color: #0d9488;
+.admin-ops .admin-main .bg-white {
+  background: linear-gradient(180deg, rgba(14, 42, 82, 0.94), rgba(7, 24, 45, 0.96)) !important;
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  box-shadow: 0 16px 40px rgba(2, 8, 24, 0.28);
+}
+
+.admin-ops .admin-main .text-slate-900,
+.admin-ops .admin-main .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+
+.admin-ops .admin-order-status {
+  width: 100%;
+  border: 0;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+}
+
+@media (min-width: 640px) {
+  .admin-ops .admin-order-status {
+    width: auto;
+    min-width: 9.5rem;
+  }
+}
+
+.plan-pricing-card {
+  position: relative;
+  background: #fff;
+  color: #0b1c33;
+  border-radius: 1.1rem 3.75rem 3.75rem 1.1rem;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.3);
+  padding: 2.15rem 1.6rem 1.35rem 1.5rem;
+}
+
+.plan-pricing-tab {
+  position: absolute;
+  top: -0.7rem;
+  left: 1.15rem;
+  z-index: 2;
+  background: var(--plan-tab, #2563eb);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.42rem 0.95rem 0.38rem;
+  border-radius: 0.15rem 0.15rem 0 0;
+}
+
+.plan-pricing-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 100%;
+  border-top: 8px solid color-mix(in srgb, var(--plan-tab, #2563eb) 62%, #020617);
+  border-right: 8px solid transparent;
+}
+
+.process-film-frame {
+  transform-origin: center;
+  animation: process-kenburns 4.5s ease-out forwards;
+}
+
+@keyframes process-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes order-success-advert-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.order-success-logo-spin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: order-success-advert-spin 8s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .process-film-frame,
+  .order-success-logo-spin {
+    animation: none;
+  }
+}
+
+.plan-pricing-check {
+  display: inline-flex;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #94a3b8;
+  border-radius: 999px;
+  color: #2563eb;
+}
+
+.admin-ops .admin-order-card {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 1.7rem 0.95rem 1rem 1.05rem;
+  border-radius: 1rem 1.6rem 1.6rem 1rem;
+  background: linear-gradient(135deg, #123a6b 0%, #0b1c33 48%, #071422 100%);
+  color: #e8eef8;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  box-shadow:
+    0 18px 50px rgba(2, 8, 24, 0.55),
+    inset 0 1px 0 rgba(125, 211, 252, 0.18);
+}
+
+.admin-ops .admin-order-card .plan-pricing-check {
+  border-color: #7dd3fc;
+  color: #38bdf8;
+  background: rgba(14, 165, 233, 0.12);
+}
+
+.admin-order-card .plan-pricing-tab {
+  left: 0.85rem;
+  font-size: 0.62rem;
+  padding: 0.36rem 0.75rem 0.32rem;
+}
+
+@media (min-width: 640px) {
+  .admin-ops .admin-order-card {
+    padding: 2.1rem 1.5rem 1.2rem 1.4rem;
+    border-radius: 1.1rem 3.75rem 3.75rem 1.1rem;
+  }
+
+  .admin-order-card .plan-pricing-tab {
+    left: 1.15rem;
+    font-size: 0.7rem;
+    padding: 0.42rem 0.95rem 0.38rem;
+  }
 }
 
 @media (max-width: 900px) {

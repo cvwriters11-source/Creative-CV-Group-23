@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { HomeCvPackages } from "@/components/home/cv-packages";
-import { HeroSlideshow } from "@/components/home/hero-slideshow";
+import { RecruitmentProcessVideo } from "@/components/packages/recruitment-process-video";
 import { ButtonLink } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
@@ -89,10 +89,10 @@ function HeroStat({
 export default function HomePage() {
   return (
     <>
-      <section className="relative isolate min-h-[85vh] overflow-hidden bg-paper">
-        <HeroSlideshow variant="background" />
+      <section className="relative isolate min-h-[calc(100dvh-5rem)] overflow-hidden bg-paper">
+        <RecruitmentProcessVideo variant="background" />
 
-        <div className="pointer-events-none relative z-10 mx-auto flex min-h-[85vh] max-w-7xl items-start px-4 py-16 pb-16 sm:px-6 lg:items-center lg:px-8 lg:py-24 lg:pb-28">
+        <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100dvh-5rem)] max-w-7xl items-start px-4 py-16 pb-28 sm:px-6 lg:items-center lg:px-8 lg:py-24 lg:pb-32">
           <div className="pointer-events-auto max-w-xl">
             <p className="inline-flex rounded-full bg-accent px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink ring-1 ring-gold/50 backdrop-blur-sm">
               Free lifetime CV amendments

@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { PackagePricingGrid } from "@/components/packages/package-card";
 import { ButtonLink } from "@/components/ui/primitives";
+import { getResolvedPackageServices, getResolvedPrimaryPackages } from "@/lib/catalog";
 import { formatZar } from "@/lib/cn";
-import { africaOnlyLabel, addons, packageOrderHref, primaryCvPackages, returnClientPackages } from "@/lib/packages";
+import { africaOnlyLabel, addons, packageOrderHref, returnClientPackages } from "@/lib/packages";
 
-export function HomeCvPackages() {
+export async function HomeCvPackages() {
+  const items = await getResolvedPrimaryPackages();
+  const services = await getResolvedPackageServices();
+
   return (
     <section id="cv-packages" className="bg-gold-soft/70">
       <div className="mx-auto max-w-6xl px-5 pt-12 pb-20 lg:px-8">
@@ -18,7 +22,7 @@ export function HomeCvPackages() {
       </p>
 
       <div className="mt-12">
-        <PackagePricingGrid items={primaryCvPackages} />
+        <PackagePricingGrid items={items} services={services} />
       </div>
 
       <div className="mt-10 rounded-3xl border border-accent/20 bg-paper p-6 md:p-8">

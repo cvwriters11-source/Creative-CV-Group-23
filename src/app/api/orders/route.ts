@@ -3,55 +3,74 @@ import { recordOrder } from "@/lib/admin/store";
 import { addons, getPackage, type AddonId } from "@/lib/packages";
 import { sendTransactionalEmail } from "@/lib/email";
 import { initializePaystack, isPaystackConfigured } from "@/lib/paystack";
+import { formatInternationalPhone, isKnownDialCode } from "@/lib/phone-codes";
 import { site } from "@/lib/site";
+import { isCvFile, isImageFile, saveOrderUpload } from "@/lib/uploads";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const form = await request.formData();
-  const fullName = String(form.get("fullName") ?? "").trim();
+  const firstName = String(form.get("firstName") ?? "").trim();
+  const lastName = String(form.get("lastName") ?? "").trim();
+  const fullNameLegacy = String(form.get("fullName") ?? "").trim();
+  const first = firstName || fullNameLegacy.split(/\s+/)[0] || "";
+  const last = lastName || fullNameLegacy.split(/\s+/).slice(1).join(" ");
+  const fullName = [first, last].filter(Boolean).join(" ");
   const email = String(form.get("email") ?? "").trim();
-  const phone = String(form.get("phone") ?? "").trim();
+  const countryCode = String(form.get("countryCode") ?? "").trim();
+  const nationalPhone = String(form.get("phone") ?? "").trim();
   const goals = String(form.get("goals") ?? "").trim();
   const packageId = String(form.get("packageId") ?? "");
   const amount = Number(form.get("amount") ?? 0);
   const addonIds = JSON.parse(String(form.get("addonIds") ?? "[]")) as AddonId[];
-  const file = form.get("cv");
+  const photo = form.get("photo");
+  const cv = form.get("cv");
+  const extra = form.get("extra");
   const pkg = getPackage(packageId);
 
-  if (!fullName || !email || !phone || !goals || !pkg) {
+  const photoFile = photo instanceof File && photo.size > 0 ? photo : null;
+  const cvFile = cv instanceof File && cv.size > 0 ? cv : null;
+  const extraFile = extra instanceof File && extra.size > 0 ? extra : null;
+
+  if (!fullName || !email || !nationalPhone || !pkg) {
     return NextResponse.json({ error: "Please complete the required order fields." }, { status: 400 });
   }
+  if (!isKnownDialCode(countryCode)) {
+    return NextResponse.json({ error: "Please choose a valid country code." }, { status: 400 });
+  }
+  if (!photoFile || !isImageFile(photoFile)) {
+    return NextResponse.json({ error: "Please upload a picture (JPG, PNG or WebP)." }, { status: 400 });
+  }
+  if (!cvFile || !isCvFile(cvFile)) {
+    return NextResponse.json({ error: "Please upload your CV as a PDF, DOC or DOCX file." }, { status: 400 });
+  }
 
-  const fileName = file instanceof File && file.size > 0 ? file.name : "";
+  const phone = formatInternationalPhone(countryCode, nationalPhone);
   const reference = `ccv-${Date.now()}`;
   const addonNames = addonIds
     .map((id) => addons.find((item) => item.id === id)?.name)
     .filter(Boolean)
     .join(", ");
 
-  const summary = [
-    `Order ${reference}`,
-    `Name: ${fullName}`,
-    `Email: ${email}`,
-    `Phone: ${phone}`,
-    `Package: ${pkg.name} (R${pkg.price})`,
-    `Add-ons: ${addonNames || "None"}`,
-    `Amount: R${amount}`,
-    `CV uploaded: ${fileName || "No"}`,
-    `Goals: ${goals}`,
-  ].join("\n");
-
-  await sendTransactionalEmail({
-    to: process.env.CONTACT_TO_EMAIL ?? site.email,
-    subject: `New Creative CV order ${reference}`,
-    text: summary,
-  });
+  let photoFileName = photoFile.name;
+  let cvFileName = cvFile.name;
+  let extraFileName = extraFile?.name ?? "";
+  try {
+    photoFileName = (await saveOrderUpload(reference, "photo", photoFile)) || photoFileName;
+    cvFileName = (await saveOrderUpload(reference, "cv", cvFile)) || cvFileName;
+    extraFileName = extraFile ? (await saveOrderUpload(reference, "extra", extraFile)) || extraFile.name : "";
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "We could not save your files.";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
 
   const paymentConfigured = isPaystackConfigured();
-  await recordOrder({
+  const order = await recordOrder({
     reference,
     fullName,
+    firstName: first,
+    lastName: last,
     email,
     phone,
     packageId: pkg.id,
@@ -60,8 +79,33 @@ export async function POST(request: Request) {
     amount,
     status: paymentConfigured ? "pending_payment" : "received",
     goals,
-    cvFileName: fileName,
+    cvFileName,
+    photoFileName,
+    extraFileName,
     paymentConfigured,
+  });
+
+  const summary = [
+    `Order ${order.orderNumber}`,
+    `Internal ref: ${reference}`,
+    `Name: ${fullName}`,
+    `Email: ${email}`,
+    `Phone: ${phone}`,
+    `Package: ${pkg.name} (R${pkg.price})`,
+    `Add-ons: ${addonNames || "None"}`,
+    `Amount: R${amount}`,
+    `Picture: ${photoFileName}`,
+    `CV: ${cvFileName}`,
+    `Additional file: ${extraFileName || "None"}`,
+    goals ? `Notes: ${goals}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  await sendTransactionalEmail({
+    to: process.env.CONTACT_TO_EMAIL ?? site.email,
+    subject: `New Creative CV order ${order.orderNumber}`,
+    text: summary,
   });
 
   if (!paymentConfigured) {
@@ -69,8 +113,7 @@ export async function POST(request: Request) {
       ok: true,
       paymentConfigured: false,
       reference,
-      message:
-        "Your order was submitted to Creative CV. Paystack keys are not configured, so no payment has been taken and this is not a successful charge. Add PAYSTACK_SECRET_KEY to enable checkout.",
+      orderNumber: order.orderNumber,
     });
   }
 
@@ -79,8 +122,8 @@ export async function POST(request: Request) {
     email,
     amountZar: amount,
     reference,
-    callbackUrl: `${origin}/packages?paid=${reference}`,
-    metadata: { packageId, fullName },
+    callbackUrl: `${origin}/packages/order?paid=${reference}`,
+    metadata: { packageId, fullName, orderNumber: order.orderNumber },
   });
 
   return NextResponse.json({
@@ -88,5 +131,6 @@ export async function POST(request: Request) {
     paymentConfigured: true,
     authorizationUrl: paystack?.authorization_url,
     reference,
+    orderNumber: order.orderNumber,
   });
 }
