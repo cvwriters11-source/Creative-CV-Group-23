@@ -1,4 +1,5 @@
 -- Creative CV schema
+-- Linked project: https://supabase.com/dashboard/project/lkintrcmjjvqwvzrawio
 -- Apply in the Supabase SQL editor, or via MCP, once a project is linked.
 
 create extension if not exists "pgcrypto";

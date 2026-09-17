@@ -38,7 +38,9 @@ Without Paystack keys, order and generator checkout still submit to the API and 
 
 Without Supabase, auth uses a local session cookie so dashboards work, and the job board uses 16 seeded South African roles.
 
-Apply `supabase/schema.sql` in the SQL editor when a project is linked.
+Linked project: [Creative-CV Group](https://supabase.com/dashboard/project/lkintrcmjjvqwvzrawio) (`eu-west-1`). Schema from `supabase/schema.sql` is already applied there.
+
+Copy `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from Project Settings → API into `.env.local`. Restart `npm run dev` after changing env.
 
 ## Brand
 
