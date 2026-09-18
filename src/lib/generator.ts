@@ -83,11 +83,19 @@ export function hydrateDraft(value: unknown): GeneratorDraft {
         : base.employment,
     education:
       Array.isArray(raw.education) && raw.education.length
-        ? raw.education.map((item) => ({ qualification: "", institution: "", year: "", ...item }))
+        ? raw.education.map((item) => ({
+            qualification: item.qualification ?? "",
+            institution: item.institution ?? "",
+            year: item.year ?? "",
+          }))
         : base.education,
     references:
       Array.isArray(raw.references) && raw.references.length
-        ? raw.references.map((item) => ({ name: "", relationship: "", contact: "", ...item }))
+        ? raw.references.map((item) => ({
+            name: item.name ?? "",
+            relationship: item.relationship ?? "",
+            contact: item.contact ?? "",
+          }))
         : base.references,
     languages: raw.languages ?? "",
     affiliations: raw.affiliations ?? "",
