@@ -42,14 +42,14 @@ export function LoginForm() {
             <button
               type="button"
               onClick={() => setRole("job_seeker")}
-              className={`rounded-full py-2 text-sm ${role === "job_seeker" ? "bg-accent text-ink" : "text-ink-soft"}`}
+              className={`rounded-full py-2 text-sm ${role === "job_seeker" ? "bg-accent text-on-accent" : "text-ink-soft"}`}
             >
               Job Seeker
             </button>
             <button
               type="button"
               onClick={() => setRole("recruiter")}
-              className={`rounded-full py-2 text-sm ${role === "recruiter" ? "bg-accent text-ink" : "text-ink-soft"}`}
+              className={`rounded-full py-2 text-sm ${role === "recruiter" ? "bg-accent text-on-accent" : "text-ink-soft"}`}
             >
               Recruiter
             </button>
@@ -57,7 +57,7 @@ export function LoginForm() {
           <form onSubmit={onSubmit} className="mt-8 grid gap-4">
             <input required type="email" name="email" placeholder="Email" className="field" />
             <input required type="password" name="password" placeholder="Password" className="field" />
-            <button type="submit" className="rounded-full bg-accent py-3 text-sm text-ink hover:bg-accent-hover">
+            <button type="submit" className="rounded-full bg-accent py-3 text-sm text-on-accent hover:bg-accent-hover">
               Sign In
             </button>
           </form>

@@ -24,6 +24,16 @@ export const comparisonFeatures = [
   { id: "writerContact", label: "Direct writer contact" },
   { id: "priorityTurnaround", label: "Priority turnaround" },
   { id: "internationalFormat", label: "International résumé" },
+  { id: "turnaround4Days", label: "Turnaround time 4 working days" },
+  { id: "recruiterDatabase", label: "Adding your email and résumé into recruiters database" },
+  { id: "jobEmailTemplate", label: "Job application email template" },
+  { id: "careerHuntTechniques", label: "Free career hunt techniques" },
+  { id: "salaryNegotiationTemplate", label: "Free salary negotiation template" },
+  { id: "jobPlacementHelp", label: "Free help with job placements" },
+  { id: "recruiterSubmission", label: "Submitting your résumé and cover letter to potential recruiters and hiring managers" },
+  { id: "interviewPreparation", label: "Interview preparation" },
+  { id: "coverLetterWriting", label: "Cover letter writing" },
+  { id: "resumeDesign", label: "Résumé design" },
 ] as const;
 
 export type ComparisonFeatureId = (typeof comparisonFeatures)[number]["id"];
@@ -35,6 +45,8 @@ export type CatalogPackage = {
   name: string;
   headerName: string;
   price: number;
+  compareAtPrice?: number;
+  promotion?: string;
   turnaroundDays: number;
   turnaroundLabel: string;
   africaOnly: boolean;
@@ -89,10 +101,27 @@ export const packages: CatalogPackage[] = [
     name: "Professional CV",
     headerName: "Professional",
     tone: "gold",
-    features: ["writtenCv", "ats", "wordPdf", "jobAlerts", "guarantee", "writerContact"],
+    features: [
+      "writtenCv",
+      "ats",
+      "wordPdf",
+      "jobAlerts",
+      "guarantee",
+      "writerContact",
+      "turnaround4Days",
+      "recruiterDatabase",
+      "jobEmailTemplate",
+      "careerHuntTechniques",
+      "salaryNegotiationTemplate",
+      "jobPlacementHelp",
+      "recruiterSubmission",
+      "interviewPreparation",
+      "coverLetterWriting",
+      "resumeDesign",
+    ],
     price: 1200,
-    turnaroundDays: 7,
-    turnaroundLabel: "7 working days",
+    turnaroundDays: 4,
+    turnaroundLabel: "4 working days",
     africaOnly: true,
     audience: "Working professionals ready to move roles, industries, or seniority.",
     summary:
@@ -101,6 +130,7 @@ export const packages: CatalogPackage[] = [
       "Custom professional CV (no templates)",
       "Industry-specific ATS optimisation",
       "Word + PDF delivery",
+      "Turnaround time 4 working days",
       "Free tailored job alerts",
       "Direct writer contact and 100% satisfaction guarantee",
     ],
@@ -268,6 +298,102 @@ export const returnClientPackages = packages.filter((item) => item.category === 
 
 export function packageHasFeature(pkg: CatalogPackage, featureId: string) {
   return pkg.features.includes(featureId);
+}
+
+export type PackageMeta = {
+  name: string;
+  headerName: string;
+  price: number;
+  compareAtPrice: number | null;
+  promotion: string;
+  turnaroundDays: number;
+  turnaroundLabel: string;
+  africaOnly: boolean;
+  audience: string;
+};
+
+export type PackageTurnaround = PackageMeta;
+
+function clampInt(value: unknown, fallback: number, min: number, max: number) {
+  const raw = Number(value);
+  if (!Number.isFinite(raw)) return fallback;
+  return Math.min(max, Math.max(min, Math.round(raw)));
+}
+
+function clampText(value: unknown, fallback: string, max: number) {
+  const text = typeof value === "string" ? value.trim() : "";
+  return (text || fallback).slice(0, max);
+}
+
+export function defaultPackageTurnaroundMap(): Record<string, PackageMeta> {
+  return Object.fromEntries(
+    packages.map((item) => [
+      item.id,
+      {
+        name: item.name,
+        headerName: item.headerName,
+        price: item.price,
+        compareAtPrice: null,
+        promotion: "",
+        turnaroundDays: item.turnaroundDays,
+        turnaroundLabel: item.turnaroundLabel,
+        africaOnly: item.africaOnly,
+        audience: item.audience,
+      },
+    ]),
+  );
+}
+
+export function normalizePackageTurnaround(
+  input: Partial<PackageMeta> | undefined,
+  fallback: PackageMeta,
+): PackageMeta {
+  const rawDays = Number(input?.turnaroundDays);
+  const turnaroundDays = Number.isFinite(rawDays)
+    ? Math.min(90, Math.max(1, Math.round(rawDays)))
+    : fallback.turnaroundDays;
+  const label = typeof input?.turnaroundLabel === "string" ? input.turnaroundLabel.trim() : "";
+  const compareRaw = Number(input?.compareAtPrice);
+  const compareAtPrice =
+    Number.isFinite(compareRaw) && compareRaw > 0 ? Math.round(compareRaw) : null;
+  return {
+    name: clampText(input?.name, fallback.name, 80),
+    headerName: clampText(input?.headerName, fallback.headerName, 32),
+    price: clampInt(input?.price, fallback.price, 1, 100000),
+    compareAtPrice,
+    promotion: clampText(input?.promotion, "", 80),
+    turnaroundDays,
+    turnaroundLabel: label || `${turnaroundDays} working days`,
+    africaOnly: typeof input?.africaOnly === "boolean" ? input.africaOnly : fallback.africaOnly,
+    audience: clampText(input?.audience, fallback.audience, 280),
+  };
+}
+
+export function applyPackageMeta(pkg: CatalogPackage, meta: PackageMeta): CatalogPackage {
+  return {
+    ...pkg,
+    name: meta.name,
+    headerName: meta.headerName,
+    price: meta.price,
+    compareAtPrice: meta.compareAtPrice && meta.compareAtPrice > meta.price ? meta.compareAtPrice : undefined,
+    promotion: meta.promotion || undefined,
+    turnaroundDays: meta.turnaroundDays,
+    turnaroundLabel: meta.turnaroundLabel,
+    africaOnly: meta.africaOnly,
+    audience: meta.audience,
+  };
+}
+
+export function packageHasPromotion(pkg: CatalogPackage) {
+  return Boolean(pkg.promotion) || Boolean(pkg.compareAtPrice && pkg.compareAtPrice > pkg.price);
+}
+
+export function nextTurnaroundLabel(days: number, previousLabel: string, previousDays: number) {
+  const exact = `${previousDays} working days`;
+  const upTo = `Up to ${previousDays} working days`;
+  if (!previousLabel.trim() || previousLabel === exact) return `${days} working days`;
+  if (previousLabel === upTo) return `Up to ${days} working days`;
+  return previousLabel;
 }
 
 export function defaultPackageServices() {

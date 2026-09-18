@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { recordOrder } from "@/lib/admin/store";
-import { addons, getPackage, type AddonId } from "@/lib/packages";
+import { getResolvedCatalog } from "@/lib/catalog";
+import { addons, type AddonId } from "@/lib/packages";
 import { sendTransactionalEmail } from "@/lib/email";
 import { initializePaystack, isPaystackConfigured } from "@/lib/paystack";
 import { formatInternationalPhone, isKnownDialCode } from "@/lib/phone-codes";
@@ -27,7 +28,8 @@ export async function POST(request: Request) {
   const photo = form.get("photo");
   const cv = form.get("cv");
   const extra = form.get("extra");
-  const pkg = getPackage(packageId);
+  const catalog = await getResolvedCatalog();
+  const pkg = catalog.find((item) => item.id === packageId);
 
   const photoFile = photo instanceof File && photo.size > 0 ? photo : null;
   const cvFile = cv instanceof File && cv.size > 0 ? cv : null;

@@ -55,7 +55,7 @@ export default async function SeekerDashboard() {
             <p className="mt-2 text-sm text-ink-soft">Get notified when matching jobs are posted.</p>
             <form action="/api/alerts" method="post" className="mt-4 grid gap-2">
               <input name="keywords" placeholder="Keywords" className="field text-sm" />
-              <button className="rounded-full bg-accent py-2 text-sm text-ink hover:bg-accent-hover">Save alert</button>
+              <button className="rounded-full bg-accent py-2 text-sm text-on-accent hover:bg-accent-hover">Save alert</button>
             </form>
           </article>
           <article className="card-surface p-6">
@@ -63,7 +63,7 @@ export default async function SeekerDashboard() {
             <p className="mt-2 text-sm text-ink-soft">Upload a CV for one-click apply.</p>
             <form action="/api/saved-cv" method="post" encType="multipart/form-data" className="mt-4 grid gap-2">
               <input type="file" name="cv" accept=".pdf,.doc,.docx" className="text-sm" />
-              <button className="rounded-full bg-accent py-2 text-sm text-ink hover:bg-accent-hover">Save CV</button>
+              <button className="rounded-full bg-accent py-2 text-sm text-on-accent hover:bg-accent-hover">Save CV</button>
             </form>
           </article>
         </div>

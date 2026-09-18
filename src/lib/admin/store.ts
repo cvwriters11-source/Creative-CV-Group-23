@@ -1,7 +1,14 @@
 import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { defaultPackageServiceMap, defaultPackageServices, packages } from "@/lib/packages";
+import {
+  defaultPackageServiceMap,
+  defaultPackageServices,
+  defaultPackageTurnaroundMap,
+  normalizePackageTurnaround,
+  packages,
+  type PackageTurnaround,
+} from "@/lib/packages";
 import type {
   ActivityItem,
   AdminApplication,
@@ -13,9 +20,12 @@ import type {
   AdminWriter,
   ContactStatus,
   GeneratorEvent,
+  OrderCorrection,
   OrderStatus,
   PackageService,
+  PublicWriter,
 } from "@/lib/admin/types";
+import { hashPassword } from "@/lib/passwords";
 
 const emptyStore = (): AdminStore => ({
   orders: [],
@@ -90,6 +100,7 @@ async function readFromDisk(): Promise<AdminStore> {
       activity: parsed.activity ?? [],
       packageServices: parsed.packageServices,
       packageServiceMap: parsed.packageServiceMap,
+      packageMeta: parsed.packageMeta,
     };
   } catch {
     return emptyStore();
@@ -118,6 +129,44 @@ export async function readAdminStore() {
 export async function getAdminOrder(id: string) {
   const store = await readAdminStore();
   return store.orders.find((order) => order.id === id) ?? null;
+}
+
+export function toPublicWriter(writer: AdminWriter): PublicWriter {
+  return {
+    id: writer.id,
+    name: writer.name,
+    email: writer.email,
+    phone: writer.phone,
+    createdAt: writer.createdAt,
+    hasPassword: Boolean(writer.passwordHash),
+  };
+}
+
+export async function getWriterByEmail(email: string) {
+  const store = await readAdminStore();
+  const needle = email.trim().toLowerCase();
+  return store.writers.find((writer) => writer.email.toLowerCase() === needle) ?? null;
+}
+
+export async function getWriterById(id: string) {
+  const store = await readAdminStore();
+  return store.writers.find((writer) => writer.id === id) ?? null;
+}
+
+export async function getWriterOrders(writerId: string) {
+  const store = await readAdminStore();
+  return store.orders.filter((order) => order.assignedWriterId === writerId);
+}
+
+export async function findOrderByNumberAndEmail(orderNumber: string, email: string) {
+  const store = await readAdminStore();
+  const number = orderNumber.trim().toLowerCase();
+  const needle = email.trim().toLowerCase();
+  return (
+    store.orders.find(
+      (order) => order.orderNumber.trim().toLowerCase() === number && order.email.trim().toLowerCase() === needle,
+    ) ?? null
+  );
 }
 
 export async function mutateAdminStore<T>(fn: (store: AdminStore) => T | Promise<T>): Promise<T> {
@@ -177,6 +226,119 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
       delete order.completedAt;
     }
     return order;
+  });
+}
+
+export async function assignWriter(orderId: string, writerId: string) {
+  return mutateAdminStore((store) => {
+    const order = store.orders.find((item) => item.id === orderId);
+    if (!order) return { error: "Order not found." } as const;
+    const writer = store.writers.find((item) => item.id === writerId);
+    if (!writer) return { error: "Writer not found." } as const;
+    order.assignedWriterId = writer.id;
+    if (order.status === "received" || order.status === "pending_payment" || order.status === "paid") {
+      order.status = "in_progress";
+    }
+    pushActivity(store, {
+      type: "writer",
+      title: "Order assigned to writer",
+      detail: `${order.orderNumber} → ${writer.name}`,
+      href: "/admin/orders",
+    });
+    return { order, writer } as const;
+  });
+}
+
+export async function submitOrderForReview(orderId: string, writerId: string, deliveryFileName: string) {
+  return mutateAdminStore((store) => {
+    const order = store.orders.find((item) => item.id === orderId);
+    if (!order) return { error: "Order not found." } as const;
+    if (order.assignedWriterId !== writerId) {
+      return { error: "This order is not assigned to you." } as const;
+    }
+    if (!["in_progress", "review", "corrections"].includes(order.status)) {
+      return { error: "This order cannot be submitted for review yet." } as const;
+    }
+    order.deliveryFileName = deliveryFileName;
+    order.status = "review";
+    order.reviewedAt = new Date().toISOString();
+    delete order.completedAt;
+    pushActivity(store, {
+      type: "order",
+      title: "CV submitted for review",
+      detail: `${order.orderNumber} · ${order.fullName}`,
+      href: "/admin/orders",
+    });
+    return { order } as const;
+  });
+}
+
+export async function approveOrder(orderId: string) {
+  return mutateAdminStore((store) => {
+    const order = store.orders.find((item) => item.id === orderId);
+    if (!order) return { error: "Order not found." } as const;
+    if (!order.deliveryFileName) return { error: "The writer has not uploaded a CV yet." } as const;
+    if (order.status !== "review" && order.status !== "corrections") {
+      return { error: "Only orders in review or corrections can be approved." } as const;
+    }
+    const now = new Date().toISOString();
+    order.status = "complete";
+    order.approvedAt = now;
+    order.completedAt = now;
+    pushActivity(store, {
+      type: "order",
+      title: "CV approved and sent to client",
+      detail: `${order.orderNumber} · ${order.fullName}`,
+      href: "/admin/orders",
+    });
+    return { order } as const;
+  });
+}
+
+export async function addOrderCorrection(input: {
+  orderId?: string;
+  orderNumber?: string;
+  email?: string;
+  message: string;
+  fileName?: string;
+  storedFileName?: string;
+  source: OrderCorrection["source"];
+}) {
+  const message = input.message.trim();
+  if (!message) return { error: "Correction notes are required." } as const;
+
+  return mutateAdminStore((store) => {
+    const email = input.email?.trim().toLowerCase();
+    const order = store.orders.find((item) => {
+      if (input.orderId && item.id === input.orderId) return true;
+      if (input.orderNumber && item.orderNumber.trim().toLowerCase() === input.orderNumber.trim().toLowerCase()) {
+        return !email || item.email.trim().toLowerCase() === email;
+      }
+      return false;
+    });
+    if (!order) return { error: "Order not found." } as const;
+    if (email && order.email.trim().toLowerCase() !== email) {
+      return { error: "Order number and email do not match." } as const;
+    }
+    const correction: OrderCorrection = {
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      message,
+      fileName: input.fileName,
+      storedFileName: input.storedFileName,
+      source: input.source,
+    };
+    order.corrections = [correction, ...(order.corrections ?? [])];
+    order.status = "corrections";
+    delete order.completedAt;
+    const writer = store.writers.find((item) => item.id === order.assignedWriterId);
+    pushActivity(store, {
+      type: "order",
+      title: "Client corrections received",
+      detail: `${order.orderNumber} · ${order.fullName}`,
+      href: "/admin/orders",
+    });
+    return { order, correction, writer } as const;
   });
 }
 
@@ -298,11 +460,14 @@ export async function recordUser(input: Omit<AdminUser, "id" | "createdAt"> & { 
   });
 }
 
-export async function addWriter(input: { name: string; email: string; phone?: string }) {
+export async function addWriter(input: { name: string; email: string; phone?: string; password: string }) {
+  const name = input.name.trim();
+  const email = input.email.trim().toLowerCase();
+  const password = input.password.trim();
+  if (!name || !email) return { error: "Name and email are required." } as const;
+  if (password.length < 6) return { error: "Password must be at least 6 characters." } as const;
+  const passwordHash = await hashPassword(password);
   return mutateAdminStore((store) => {
-    const email = input.email.trim().toLowerCase();
-    const name = input.name.trim();
-    if (!name || !email) return { error: "Name and email are required." } as const;
     if (store.writers.some((item) => item.email.toLowerCase() === email)) {
       return { error: "A writer with this email already exists." } as const;
     }
@@ -311,6 +476,7 @@ export async function addWriter(input: { name: string; email: string; phone?: st
       name,
       email,
       phone: input.phone?.trim() ?? "",
+      passwordHash,
       createdAt: new Date().toISOString(),
     };
     store.writers.unshift(writer);
@@ -320,7 +486,19 @@ export async function addWriter(input: { name: string; email: string; phone?: st
       detail: `${writer.name} · ${writer.email}`,
       href: "/admin/writers",
     });
-    return { writer } as const;
+    return { writer: toPublicWriter(writer) } as const;
+  });
+}
+
+export async function setWriterPassword(id: string, password: string) {
+  const next = password.trim();
+  if (next.length < 6) return { error: "Password must be at least 6 characters." } as const;
+  const passwordHash = await hashPassword(next);
+  return mutateAdminStore((store) => {
+    const writer = store.writers.find((item) => item.id === id);
+    if (!writer) return { error: "Writer not found." } as const;
+    writer.passwordHash = passwordHash;
+    return { writer: toPublicWriter(writer) } as const;
   });
 }
 
@@ -367,6 +545,13 @@ export async function recordGeneratorEvent(input: Omit<GeneratorEvent, "id" | "c
   });
 }
 
+function resolvedPackageMeta(saved: Record<string, PackageTurnaround> | undefined) {
+  const defaults = defaultPackageTurnaroundMap();
+  return Object.fromEntries(
+    packages.map((pkg) => [pkg.id, normalizePackageTurnaround(saved?.[pkg.id], defaults[pkg.id])]),
+  );
+}
+
 export async function getPackageServiceCatalog() {
   const store = await readAdminStore();
   const defaults = defaultPackageServices();
@@ -377,13 +562,18 @@ export async function getPackageServiceCatalog() {
   for (const pkg of packages) {
     if (!map[pkg.id]) map[pkg.id] = [...pkg.features];
   }
-  return { services, map };
+  return { services, map, meta: resolvedPackageMeta(store.packageMeta) };
 }
 
-export async function savePackageServiceCatalog(input: { services: PackageService[]; map: Record<string, string[]> }) {
+export async function savePackageServiceCatalog(input: {
+  services: PackageService[];
+  map: Record<string, string[]>;
+  meta?: Record<string, PackageTurnaround>;
+}) {
   return mutateAdminStore((store) => {
     store.packageServices = input.services;
     store.packageServiceMap = input.map;
-    return { services: store.packageServices, map: store.packageServiceMap };
+    if (input.meta) store.packageMeta = resolvedPackageMeta(input.meta);
+    return { services: store.packageServices, map: store.packageServiceMap, meta: resolvedPackageMeta(store.packageMeta) };
   });
 }

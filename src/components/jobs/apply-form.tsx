@@ -41,7 +41,7 @@ export function ApplyForm({ jobId, jobTitle }: { jobId: string; jobTitle: string
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="rounded-full bg-accent py-3 text-sm text-ink hover:bg-accent-hover disabled:opacity-60"
+        className="rounded-full bg-accent py-3 text-sm text-on-accent hover:bg-accent-hover disabled:opacity-60"
       >
         {status === "submitting" ? "Submitting…" : "Apply"}
       </button>

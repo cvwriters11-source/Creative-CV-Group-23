@@ -9,6 +9,7 @@ export type Job = {
   salaryMin: number | null;
   salaryMax: number | null;
   salaryLabel: string;
+  logoFileName?: string;
   postedAt: string;
   featured?: boolean;
   description: string;

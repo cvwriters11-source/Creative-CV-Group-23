@@ -12,3 +12,13 @@ export function formatAdminDay(value: string) {
   if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat("en-ZA", { dateStyle: "medium" }).format(date);
 }
+
+export const orderStatusLabels: Record<string, string> = {
+  received: "Received",
+  pending_payment: "Pending payment",
+  paid: "Paid",
+  in_progress: "Assigned",
+  review: "In review",
+  corrections: "Corrections",
+  complete: "Complete",
+};

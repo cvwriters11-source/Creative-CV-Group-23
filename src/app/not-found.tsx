@@ -11,7 +11,7 @@ export default function NotFound() {
         <p className="mt-4 text-ink-soft">That page isn’t on Creative CV. Try packages, jobs, or the generator.</p>
         <Link
           href="/"
-          className="mt-8 inline-block rounded-full bg-accent px-5 py-3 text-sm text-ink hover:bg-accent-hover"
+          className="mt-8 inline-block rounded-full bg-accent px-5 py-3 text-sm text-on-accent hover:bg-accent-hover"
         >
           Back home
         </Link>

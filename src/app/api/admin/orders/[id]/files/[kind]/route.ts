@@ -3,19 +3,24 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin/session";
 import { getAdminOrder } from "@/lib/admin/store";
-import { contentTypeForFileName, resolveOrderUpload, type OrderUploadKind } from "@/lib/uploads";
+import {
+  contentTypeForFileName,
+  resolveOrderUpload,
+  resolveStoredUpload,
+  type OrderUploadKind,
+} from "@/lib/uploads";
 
 export const runtime = "nodejs";
 
-const kinds: OrderUploadKind[] = ["photo", "cv", "extra"];
+const kinds: OrderUploadKind[] = ["photo", "cv", "extra", "delivery"];
 
-function isUploadKind(value: string): value is OrderUploadKind {
-  return kinds.includes(value as OrderUploadKind);
-}
-
-function originalNameFor(kind: OrderUploadKind, order: { cvFileName: string; photoFileName?: string; extraFileName?: string }) {
+function originalNameFor(
+  kind: OrderUploadKind,
+  order: { cvFileName: string; photoFileName?: string; extraFileName?: string; deliveryFileName?: string },
+) {
   if (kind === "cv") return order.cvFileName;
   if (kind === "photo") return order.photoFileName;
+  if (kind === "delivery") return order.deliveryFileName;
   return order.extraFileName;
 }
 
@@ -35,20 +40,39 @@ export async function GET(
   }
 
   const { id, kind } = await context.params;
-  if (!isUploadKind(kind)) {
-    return NextResponse.json({ error: "Unknown file type." }, { status: 400 });
-  }
-
   const order = await getAdminOrder(id);
   if (!order) return NextResponse.json({ error: "Order not found." }, { status: 404 });
 
-  const originalName = originalNameFor(kind, order);
-  const filePath = await resolveOrderUpload(order.reference, kind, originalName);
+  const url = new URL(request.url);
+  const download = url.searchParams.get("download") === "1";
+  const stored = url.searchParams.get("stored") ?? "";
+
+  if (kind === "correction") {
+    const correction = order.corrections?.find((item) => item.storedFileName === stored);
+    const filePath = await resolveStoredUpload(order.reference, correction?.storedFileName);
+    if (!filePath) return NextResponse.json({ error: "File not found." }, { status: 404 });
+    const file = await fs.readFile(filePath);
+    const downloadName = correction?.fileName || path.basename(filePath);
+    return new NextResponse(new Uint8Array(file), {
+      headers: {
+        "Content-Type": contentTypeForFileName(downloadName),
+        "Content-Disposition": contentDisposition(downloadName, download),
+        "Cache-Control": "private, no-store",
+      },
+    });
+  }
+
+  if (!kinds.includes(kind as OrderUploadKind)) {
+    return NextResponse.json({ error: "Unknown file type." }, { status: 400 });
+  }
+
+  const uploadKind = kind as OrderUploadKind;
+  const originalName = originalNameFor(uploadKind, order);
+  const filePath = await resolveOrderUpload(order.reference, uploadKind, originalName);
   if (!filePath) return NextResponse.json({ error: "File not found." }, { status: 404 });
 
   const file = await fs.readFile(filePath);
-  const downloadName = originalName?.trim() || path.basename(filePath).replace(/^(photo|cv|extra)-/, "");
-  const download = new URL(request.url).searchParams.get("download") === "1";
+  const downloadName = originalName?.trim() || path.basename(filePath).replace(/^(photo|cv|extra|delivery)-/, "");
 
   return new NextResponse(new Uint8Array(file), {
     headers: {

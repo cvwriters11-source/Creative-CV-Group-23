@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { JobLogo } from "@/components/jobs/job-logo";
 import { filterJobs, industries, provinces, seedJobs, type Job } from "@/lib/jobs";
 import { PageIntro } from "@/components/ui/primitives";
 
@@ -82,16 +83,19 @@ export function JobsBoard({ initialJobs }: { initialJobs?: Job[] }) {
                 className="block rounded-3xl border border-line-brand bg-paper px-6 py-6 transition-colors hover:border-accent hover:bg-accent-soft/30"
               >
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <p className="kicker">{job.industry}</p>
-                    <h2 className="mt-2 font-serif text-2xl">{job.title}</h2>
-                    <p className="mt-1 text-ink-soft">
-                      {job.company} · {job.location}
-                    </p>
+                  <div className="flex min-w-0 items-start gap-4">
+                    <JobLogo job={job} />
+                    <div className="min-w-0">
+                      <p className="kicker">{job.industry}</p>
+                      <h2 className="mt-2 font-serif text-2xl">{job.title}</h2>
+                      <p className="mt-1 text-ink-soft">
+                        {job.company} · {job.location}
+                      </p>
+                    </div>
                   </div>
                   <div className="text-sm text-ink-soft md:text-right">
-                    <p className="font-medium text-accent">{job.salaryLabel}</p>
-                    <p className="mt-1">{job.type}</p>
+                    {job.salaryLabel ? <p className="font-medium text-accent">{job.salaryLabel}</p> : null}
+                    <p className={job.salaryLabel ? "mt-1" : ""}>{job.type}</p>
                   </div>
                 </div>
               </Link>

@@ -38,7 +38,7 @@ function isActivePath(pathname: string, href: string, aliases?: string[]) {
   return Boolean(aliases?.some((alias) => pathname === alias || pathname.startsWith(`${alias}/`)));
 }
 
-export function AdminSidebar({ email }: { email: string }) {
+export function AdminSidebar({ email, pendingCount }: { email: string; pendingCount: number }) {
   const pathname = usePathname();
 
   return (
@@ -55,7 +55,7 @@ export function AdminSidebar({ email }: { email: string }) {
         </div>
 
         <div className="relative z-10 h-full overflow-y-auto px-3 py-3">
-          <div className="rounded-xl bg-blue-600 p-1.5 shadow-sm">
+          <div className="rounded-xl bg-steel p-1.5 shadow-sm">
             <div className="grid grid-cols-2 gap-1 min-[520px]:grid-cols-4 lg:grid-cols-2">
               {links.map((item) => {
                 const active = isActivePath(pathname, item.href, item.aliases);
@@ -64,8 +64,13 @@ export function AdminSidebar({ email }: { email: string }) {
                   <Link
                     key={item.href}
                     href={item.href}
+                    aria-label={
+                      item.href === "/admin" && pendingCount > 0
+                        ? `Dashboard, ${pendingCount} pending orders`
+                        : undefined
+                    }
                     className={cn(
-                      "flex min-h-9 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold leading-tight tracking-tight whitespace-nowrap transition-colors",
+                      "relative flex min-h-9 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold leading-tight tracking-tight whitespace-nowrap transition-colors",
                       active
                         ? "bg-white text-[#0b1c33] shadow-sm"
                         : "text-white hover:bg-white/15",
@@ -73,6 +78,11 @@ export function AdminSidebar({ email }: { email: string }) {
                   >
                     <Icon size={16} className="shrink-0" />
                     <span className="min-w-0">{item.label}</span>
+                    {item.href === "/admin" && pendingCount > 0 ? (
+                      <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+                        {pendingCount > 99 ? "99+" : pendingCount}
+                      </span>
+                    ) : null}
                   </Link>
                 );
               })}
@@ -83,7 +93,7 @@ export function AdminSidebar({ email }: { email: string }) {
 
       <div className="relative z-10 shrink-0 border-t border-white/10 p-4">
         <div className="mb-3 flex items-center gap-3 rounded-xl bg-white/5 px-3 py-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-on-accent">
             {email.slice(0, 1).toUpperCase()}
           </span>
           <div className="min-w-0">

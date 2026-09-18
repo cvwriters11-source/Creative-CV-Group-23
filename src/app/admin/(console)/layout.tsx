@@ -16,9 +16,9 @@ export default async function AdminConsoleLayout({ children }: { children: React
 
   return (
     <div className="admin-ops flex min-h-screen w-full min-w-0 flex-col overflow-x-hidden lg:flex-row">
-      <AdminSidebar email={session.email} />
+      <AdminSidebar email={session.email} pendingCount={pendingCount} />
       <div className="admin-main flex min-w-0 flex-1 flex-col">
-        <AdminTopbar pendingCount={pendingCount} />
+        <AdminTopbar />
         <div className="min-w-0 flex-1 px-4 py-6 lg:px-8">{children}</div>
       </div>
     </div>

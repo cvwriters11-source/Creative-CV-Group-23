@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin/session";
 import { getPackageServiceCatalog, savePackageServiceCatalog } from "@/lib/admin/store";
 import type { PackageService } from "@/lib/admin/types";
-import { packages } from "@/lib/packages";
+import { packages, type PackageTurnaround } from "@/lib/packages";
 
 export const runtime = "nodejs";
 
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
     action?: "save" | "add";
     services?: PackageService[];
     map?: Record<string, string[]>;
+    meta?: Record<string, PackageTurnaround>;
     label?: string;
     packageIds?: string[];
   };
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
       else next.delete(id);
       map[pkg.id] = [...next];
     }
-    await savePackageServiceCatalog({ services, map });
+  await savePackageServiceCatalog({ services, map, meta: current.meta });
     return NextResponse.json(await getPackageServiceCatalog());
   }
 
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Services and package map are required." }, { status: 400 });
   }
 
-  await savePackageServiceCatalog({ services: body.services, map: body.map });
+  await savePackageServiceCatalog({ services: body.services, map: body.map, meta: body.meta ?? current.meta });
   return NextResponse.json(await getPackageServiceCatalog());
 }
 
@@ -87,6 +88,6 @@ export async function DELETE(request: Request) {
   const map = Object.fromEntries(
     Object.entries(current.map).map(([pkgId, ids]) => [pkgId, ids.filter((id) => id !== body.id)]),
   );
-  await savePackageServiceCatalog({ services, map });
+  await savePackageServiceCatalog({ services, map, meta: current.meta });
   return NextResponse.json(await getPackageServiceCatalog());
 }

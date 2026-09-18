@@ -54,7 +54,7 @@ export function AdminLoginForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-full bg-accent py-3 text-sm font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
+              className="rounded-full bg-accent py-3 text-sm font-semibold text-on-accent hover:bg-accent-hover disabled:opacity-60"
             >
               {submitting ? "Signing in…" : "Sign in to dashboard"}
             </button>

@@ -4,6 +4,7 @@ export async function sendTransactionalEmail(input: {
   to: string;
   subject: string;
   text: string;
+  attachments?: { filename: string; content: string }[];
 }) {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
@@ -20,6 +21,7 @@ export async function sendTransactionalEmail(input: {
       to: [input.to],
       subject: input.subject,
       text: input.text,
+      attachments: input.attachments,
     }),
   });
   if (!response.ok) {

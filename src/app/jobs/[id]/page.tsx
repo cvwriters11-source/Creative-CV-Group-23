@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getJobById } from "@/lib/admin/jobs";
 import { ApplyForm } from "@/components/jobs/apply-form";
+import { JobLogo } from "@/components/jobs/job-logo";
 import { ButtonLink } from "@/components/ui/primitives";
 
 export const dynamic = "force-dynamic";
@@ -17,12 +18,17 @@ export default async function JobDetailPage({ params }: Props) {
       <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
         <article>
           <p className="kicker">{job.industry}</p>
-          <h1 className="mt-3 font-serif text-4xl tracking-tight md:text-5xl">{job.title}</h1>
-          <div className="brand-rule mt-4" aria-hidden />
-          <p className="mt-4 text-lg text-ink-soft">
-            {job.company} · {job.location} · {job.type}
-          </p>
-          <p className="mt-2 font-medium text-accent">{job.salaryLabel}</p>
+          <div className="mt-3 flex items-start gap-4">
+            <JobLogo job={job} className="mt-1 h-14 w-14" />
+            <div>
+              <h1 className="font-serif text-4xl tracking-tight md:text-5xl">{job.title}</h1>
+              <div className="brand-rule mt-4" aria-hidden />
+              <p className="mt-4 text-lg text-ink-soft">
+                {job.company} · {job.location} · {job.type}
+              </p>
+              {job.salaryLabel ? <p className="mt-2 font-medium text-accent">{job.salaryLabel}</p> : null}
+            </div>
+          </div>
           <p className="mt-8 leading-relaxed text-ink-soft">{job.description}</p>
           <h2 className="heading-accent mt-10 font-serif text-2xl">Requirements</h2>
           <ul className="mt-4 space-y-2 text-ink-soft">

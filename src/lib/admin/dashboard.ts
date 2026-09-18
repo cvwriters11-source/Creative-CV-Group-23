@@ -2,7 +2,7 @@ import type { AdminOrder, AdminStore, AdminWriter } from "@/lib/admin/types";
 
 const TZ = "Africa/Johannesburg";
 
-const paidStatuses = new Set(["paid", "in_progress", "complete"]);
+const paidStatuses = new Set(["paid", "in_progress", "review", "corrections", "complete"]);
 
 export function isPaidOrder(order: AdminOrder) {
   return paidStatuses.has(order.status);
@@ -121,6 +121,8 @@ export function getDashboardMetrics(store: AdminStore) {
     pendingOrders: store.orders.filter(
       (order) => order.status === "received" || order.status === "pending_payment",
     ).length,
+    reviewOrders: store.orders.filter((order) => order.status === "review"),
+    correctionOrders: store.orders.filter((order) => order.status === "corrections"),
     completedOrders: store.orders.filter((order) => order.status === "complete").length,
     totalCustomers: uniqueCustomers.size,
     writers: getWriterPerformance(store),

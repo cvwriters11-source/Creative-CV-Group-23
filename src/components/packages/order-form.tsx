@@ -168,7 +168,7 @@ export function OrderForm({ packageId, addonIds, packageName, total }: Props) {
       <button
         type="submit"
         disabled={status === "submitting" || status === "redirecting"}
-        className="mt-6 w-full rounded-full bg-accent py-3 text-sm font-bold uppercase tracking-[0.14em] text-ink hover:bg-accent-hover disabled:opacity-60"
+        className="mt-6 w-full rounded-full bg-accent py-3 text-sm font-bold uppercase tracking-[0.14em] text-on-accent hover:bg-accent-hover disabled:opacity-60"
       >
         {status === "submitting" ? "Submitting…" : status === "redirecting" ? "Redirecting to Paystack…" : "Continue to payment"}
       </button>

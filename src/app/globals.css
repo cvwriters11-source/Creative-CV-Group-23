@@ -3,30 +3,31 @@
 @theme {
   --font-sans: var(--font-source-sans), "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-playfair), "Playfair Display", "Iowan Old Style", Palatino, Georgia, serif;
-  --color-ink: #f8fafc;
-  --color-ink-soft: #94a3b8;
-  --color-paper: #020617;
-  --color-paper-deep: #050b18;
-  --color-wash: #0a1628;
-  --color-gold-soft: #0b1e36;
-  --color-line: #1e3a5f;
-  --color-line-brand: #2563eb;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1e6fff;
-  --color-accent-soft: #122a4a;
-  --color-gold: #3b82f6;
-  --color-gold-hover: #2563eb;
-  --color-brand: #1e6fff;
-  --color-brand-hover: #3b82f6;
-  --color-ok: #22c55e;
-  --color-pack-gold: #2563eb;
-  --color-pack-gold-hover: #1d4ed8;
-  --color-coral: #0a1628;
-  --color-coral-hover: #050b18;
-  --color-charcoal: #020617;
-  --color-charcoal-hover: #050b18;
-  --color-steel: #0a1628;
-  --color-steel-hover: #122a4a;
+  --color-ink: #f3efe6;
+  --color-ink-soft: #b7b3a8;
+  --color-paper: #08111a;
+  --color-paper-deep: #0d1722;
+  --color-wash: #0a131c;
+  --color-gold-soft: #16140f;
+  --color-line: #2c3a4a;
+  --color-line-brand: #c6a15b;
+  --color-accent: #c6a15b;
+  --color-accent-hover: #d4b36e;
+  --color-accent-soft: #1c2416;
+  --color-on-accent: #0b1623;
+  --color-gold: #c6a15b;
+  --color-gold-hover: #d4b36e;
+  --color-brand: #1b365d;
+  --color-brand-hover: #254675;
+  --color-ok: #3d9a6a;
+  --color-pack-gold: #c6a15b;
+  --color-pack-gold-hover: #b08d4a;
+  --color-coral: #0a131c;
+  --color-coral-hover: #08111a;
+  --color-charcoal: #10161f;
+  --color-charcoal-hover: #171e28;
+  --color-steel: #1b365d;
+  --color-steel-hover: #254675;
   --color-whatsapp: #25d366;
   --color-whatsapp-hover: #1ebe5d;
 }
@@ -75,7 +76,7 @@ h2 {
 
 .brand-bar {
   height: 0.28rem;
-  background: linear-gradient(90deg, var(--color-gold) 0%, var(--color-accent) 48%, #1e6fff 100%);
+  background: linear-gradient(90deg, var(--color-gold) 0%, #1b365d 55%, #0b1623 100%);
 }
 
 .kicker {
@@ -90,10 +91,10 @@ h2 {
 }
 
 .card-surface {
-  background: #0a1628;
-  border: 1px solid color-mix(in srgb, #3b82f6 42%, transparent);
+  background: #0d1722;
+  border: 1px solid color-mix(in srgb, #c6a15b 26%, transparent);
   border-radius: 1.5rem;
-  box-shadow: 0 0 28px rgba(37, 99, 235, 0.14);
+  box-shadow: 0 18px 40px rgba(4, 8, 16, 0.4);
 }
 
 .heading-accent {
@@ -310,22 +311,23 @@ h2 {
 
 .admin-ops {
   color-scheme: dark;
-  --color-ink: #f8fafc;
-  --color-ink-soft: #94a3b8;
-  --color-paper: #0c2344;
-  --color-paper-deep: #07182d;
-  --color-wash: #05101c;
-  --color-line: #1e3a5f;
-  --color-line-brand: #2563eb;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #60a5fa;
-  --color-accent-soft: #122a4a;
-  --color-gold: #38bdf8;
-  color: #e2e8f0;
+  --color-ink: #f3efe6;
+  --color-ink-soft: #b7b3a8;
+  --color-paper: #0c1826;
+  --color-paper-deep: #07111a;
+  --color-wash: #051018;
+  --color-line: #2c3a4a;
+  --color-line-brand: #c6a15b;
+  --color-accent: #c6a15b;
+  --color-accent-hover: #d4b36e;
+  --color-accent-soft: #1c2416;
+  --color-on-accent: #0b1623;
+  --color-gold: #c6a15b;
+  color: #e8e4d8;
   background:
-    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(37, 99, 235, 0.38), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(14, 165, 233, 0.16), transparent 50%),
-    #05101c;
+    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(198, 161, 91, 0.16), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(27, 54, 93, 0.35), transparent 50%),
+    #051018;
 }
 
 .admin-ops h1,
@@ -335,21 +337,21 @@ h2 {
 }
 
 .admin-ops .card-surface {
-  background: linear-gradient(180deg, #0e2a52 0%, #07182d 100%);
-  border: 1px solid rgba(59, 130, 246, 0.28);
+  background: linear-gradient(180deg, #132033 0%, #0b1520 100%);
+  border: 1px solid rgba(198, 161, 91, 0.22);
   border-radius: 1rem;
   box-shadow: 0 16px 40px rgba(2, 8, 24, 0.35);
 }
 
 .admin-ops .field {
-  border: 1px solid #1e4d8c;
-  background: #071422;
-  color: #f8fafc;
+  border: 1px solid #2c3a4a;
+  background: #07111a;
+  color: #f3efe6;
 }
 
 .admin-ops .admin-main .bg-white {
-  background: linear-gradient(180deg, rgba(14, 42, 82, 0.94), rgba(7, 24, 45, 0.96)) !important;
-  border: 1px solid rgba(59, 130, 246, 0.22);
+  background: linear-gradient(180deg, rgba(19, 32, 51, 0.96), rgba(11, 21, 32, 0.98)) !important;
+  border: 1px solid rgba(198, 161, 91, 0.18);
   box-shadow: 0 16px 40px rgba(2, 8, 24, 0.28);
 }
 
@@ -361,8 +363,8 @@ h2 {
 .admin-ops .admin-order-status {
   width: 100%;
   border: 0;
-  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
-  color: #fff;
+  background: linear-gradient(180deg, #c6a15b, #9a7a3d);
+  color: #0b1623;
   border-radius: 999px;
   padding: 0.65rem 1.1rem;
   font-size: 0.68rem;
@@ -370,7 +372,7 @@ h2 {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-align: center;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 8px 20px rgba(198, 161, 91, 0.28);
 }
 
 @media (min-width: 640px) {
@@ -394,7 +396,7 @@ h2 {
   top: -0.7rem;
   left: 1.15rem;
   z-index: 2;
-  background: var(--plan-tab, #2563eb);
+  background: var(--plan-tab, #1b365d);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 800;
@@ -409,7 +411,7 @@ h2 {
   position: absolute;
   left: 0;
   top: 100%;
-  border-top: 8px solid color-mix(in srgb, var(--plan-tab, #2563eb) 62%, #020617);
+  border-top: 8px solid color-mix(in srgb, var(--plan-tab, #1b365d) 62%, #020617);
   border-right: 8px solid transparent;
 }
 
@@ -460,7 +462,7 @@ h2 {
   justify-content: center;
   border: 1.5px solid #94a3b8;
   border-radius: 999px;
-  color: #2563eb;
+  color: #c6a15b;
 }
 
 .admin-ops .admin-order-card {
@@ -469,18 +471,18 @@ h2 {
   overflow: hidden;
   padding: 1.7rem 0.95rem 1rem 1.05rem;
   border-radius: 1rem 1.6rem 1.6rem 1rem;
-  background: linear-gradient(135deg, #123a6b 0%, #0b1c33 48%, #071422 100%);
-  color: #e8eef8;
-  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: linear-gradient(135deg, #1b365d 0%, #10161f 48%, #07111a 100%);
+  color: #e8e4d8;
+  border: 1px solid rgba(198, 161, 91, 0.28);
   box-shadow:
     0 18px 50px rgba(2, 8, 24, 0.55),
-    inset 0 1px 0 rgba(125, 211, 252, 0.18);
+    inset 0 1px 0 rgba(198, 161, 91, 0.16);
 }
 
 .admin-ops .admin-order-card .plan-pricing-check {
-  border-color: #7dd3fc;
-  color: #38bdf8;
-  background: rgba(14, 165, 233, 0.12);
+  border-color: #c6a15b;
+  color: #c6a15b;
+  background: rgba(198, 161, 91, 0.12);
 }
 
 .admin-order-card .plan-pricing-tab {

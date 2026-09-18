@@ -16,9 +16,9 @@ const navButtonBase =
   "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border text-sm font-extrabold tracking-tight transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 md:text-[15px] lg:text-base";
 
 const navButtonIdle =
-  "border-transparent bg-accent text-white hover:bg-accent-hover";
+  "border-transparent bg-steel text-white hover:bg-steel-hover";
 
-const navButtonActive = "border-transparent bg-brand text-white ring-2 ring-white/70";
+const navButtonActive = "border-transparent bg-accent text-on-accent ring-1 ring-on-accent/20";
 
 export function Header() {
   const pathname = usePathname();
@@ -45,7 +45,7 @@ export function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-blue-100 bg-white">
+    <header className="sticky top-0 z-50 border-b border-[#eadfca] bg-white">
       <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:px-5 lg:min-h-24 lg:px-8">
         <Link href="/" className="flex shrink-0 items-center" onClick={() => setOpen(false)}>
           <BrandLogo className="h-12 w-auto object-contain object-left sm:h-14 lg:h-16" />
@@ -83,7 +83,9 @@ export function Header() {
             className={cn(
               navButtonBase,
               "shrink-0 px-3 py-1.5 md:px-4 lg:px-5 lg:py-2",
-              pathname.startsWith("/auth/register") ? navButtonActive : navButtonIdle,
+              pathname.startsWith("/auth/register")
+                ? navButtonActive
+                : "border-transparent bg-accent text-on-accent hover:bg-accent-hover",
             )}
           >
             Register
@@ -137,7 +139,9 @@ export function Header() {
               className={cn(
                 navButtonBase,
                 "w-full px-4 py-3.5 text-base",
-                pathname.startsWith("/auth/register") ? navButtonActive : navButtonIdle,
+                pathname.startsWith("/auth/register")
+                  ? navButtonActive
+                  : "border-transparent bg-accent text-on-accent hover:bg-accent-hover",
               )}
               onClick={() => setOpen(false)}
             >

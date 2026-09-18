@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Check, X } from "lucide-react";
+import { Check, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/cn";
 import {
   africaOnlyHeaderLabel,
   comparisonFeatures,
   packageHasFeature,
+  packageHasPromotion,
   packageOrderHref,
   type CatalogPackage,
   type PackageId,
@@ -15,65 +16,64 @@ import {
 
 const tones: Record<
   PackageTone,
-  { header: string; button: string; check: string; ring: string; title: string; muted: string; badge: string }
+  { header: string; button: string; check: string; ring: string; title: string; muted: string; badge: string; price: string }
 > = {
   gold: {
     header: "bg-accent",
-    button: "bg-accent text-ink hover:bg-accent-hover",
-    check: "bg-accent text-ink",
+    button: "bg-on-accent text-accent hover:bg-steel",
+    check: "bg-accent text-on-accent",
     ring: "ring-accent",
-    title: "text-ink",
-    muted: "text-ink/80",
-    badge: "border-white/40 bg-white/15 text-white",
+    title: "text-on-accent",
+    muted: "text-on-accent/80",
+    badge: "border-on-accent/30 bg-on-accent/10 text-on-accent",
+    price: "bg-on-accent/10 text-on-accent ring-on-accent/40",
   },
   navy: {
     header: "bg-steel",
-    button: "bg-steel text-white hover:bg-steel-hover",
-    check: "bg-steel text-white",
+    button: "bg-accent text-on-accent hover:bg-accent-hover",
+    check: "bg-accent text-on-accent",
     ring: "ring-steel",
     title: "text-white",
     muted: "text-white/90",
     badge: "border-white/40 bg-white/15 text-white",
+    price: "bg-white/20 text-white ring-white/75",
   },
   charcoal: {
     header: "bg-charcoal",
-    button: "bg-charcoal text-white hover:bg-charcoal-hover",
-    check: "bg-charcoal text-white",
+    button: "bg-accent text-on-accent hover:bg-accent-hover",
+    check: "bg-accent text-on-accent",
     ring: "ring-charcoal",
     title: "text-white",
     muted: "text-white/90",
     badge: "border-white/40 bg-white/15 text-white",
+    price: "bg-white/20 text-white ring-white/75",
   },
   ink: {
     header: "bg-brand",
-    button: "bg-brand text-ink hover:bg-brand-hover",
-    check: "bg-brand text-ink",
+    button: "bg-accent text-on-accent hover:bg-accent-hover",
+    check: "bg-accent text-on-accent",
     ring: "ring-brand",
-    title: "text-ink",
-    muted: "text-ink/90",
+    title: "text-white",
+    muted: "text-white/90",
     badge: "border-white/40 bg-white/15 text-white",
+    price: "bg-white/20 text-white ring-white/75",
   },
   steel: {
-    header: "bg-accent-soft",
-    button: "bg-accent-soft text-ink hover:bg-steel-hover",
-    check: "bg-accent-soft text-ink",
+    header: "bg-steel",
+    button: "bg-accent text-on-accent hover:bg-accent-hover",
+    check: "bg-accent text-on-accent",
     ring: "ring-accent",
-    title: "text-ink",
-    muted: "text-ink/90",
+    title: "text-white",
+    muted: "text-white/90",
     badge: "border-white/40 bg-white/15 text-white",
+    price: "bg-white/20 text-white ring-white/75",
   },
 };
 
-function FeatureMark({ included, checkClass }: { included: boolean; checkClass: string }) {
+function FeatureMark({ checkClass }: { checkClass: string }) {
   return (
-    <span
-      className={cn(
-        "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full",
-        included ? checkClass : "bg-line text-white",
-      )}
-      aria-hidden
-    >
-      {included ? <Check className="size-3" strokeWidth={3} /> : <X className="size-3" strokeWidth={3} />}
+    <span className={cn("mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full", checkClass)} aria-hidden>
+      <Check className="size-3" strokeWidth={3} />
     </span>
   );
 }
@@ -91,18 +91,19 @@ export function PackageCard({
 }) {
   const theme = tones[pkg.tone] ?? tones.navy;
   const featured = Boolean(pkg.popular);
+  const includedServices = services.filter((feature) => packageHasFeature(pkg, feature.id));
 
   return (
     <article
       className={cn(
         "flex flex-col overflow-hidden rounded-[1.35rem] border border-accent/35 bg-paper-deep shadow-[0_14px_40px_rgba(2,6,23,0.45)] transition-[transform,box-shadow] duration-200",
-        featured && "lg:shadow-[0_22px_50px_rgba(37,99,235,0.32)]",
+        featured && "lg:shadow-[0_22px_50px_rgba(198,161,91,0.22)]",
         selected && cn("ring-2 ring-offset-2 ring-offset-paper", theme.ring),
         onSelect && "cursor-pointer",
       )}
       onClick={onSelect ? () => onSelect(pkg.id) : undefined}
     >
-      <header className={cn("relative", pkg.regionLabel ? "h-[14.25rem]" : featured ? "h-[11.75rem]" : "h-[10.5rem]")}>
+      <header className={cn("relative", pkg.regionLabel || packageHasPromotion(pkg) ? "h-[14.25rem]" : featured ? "h-[11.75rem]" : "h-[10.5rem]")}>
         <div
           className={cn(
             "absolute inset-0",
@@ -116,8 +117,13 @@ export function PackageCard({
               <h3 className={cn("font-sans text-xl font-bold uppercase leading-tight tracking-[0.03em]", theme.title)}>
                 {pkg.headerName}
               </h3>
-              {featured ? (
+              {pkg.promotion ? (
+                <p className={cn("mt-1 text-[11px] font-semibold uppercase tracking-[0.14em]", theme.muted)}>{pkg.promotion}</p>
+              ) : featured ? (
                 <p className={cn("mt-1 text-[11px] font-semibold uppercase tracking-[0.16em]", theme.muted)}>Most popular</p>
+              ) : null}
+              {featured && pkg.promotion ? (
+                <p className={cn("mt-0.5 text-[11px] font-semibold uppercase tracking-[0.16em]", theme.muted)}>Most popular</p>
               ) : null}
               <p className={cn("mt-1.5 text-[13.5px] font-medium leading-snug", theme.muted)}>{pkg.turnaroundLabel}</p>
               {pkg.africaOnly ? (
@@ -129,13 +135,18 @@ export function PackageCard({
             <div
               className={cn(
                 "flex size-[5.15rem] shrink-0 items-center justify-center rounded-full ring-2",
-                "bg-white/20 text-white ring-white/75",
+                theme.price,
               )}
               aria-label={`${pkg.name} price R${pkg.price}`}
             >
-              <span className="flex items-center font-bold leading-none tracking-tight">
-                <span className="text-2xl">R</span>
-                <span className="text-2xl">{pkg.price}</span>
+              <span className="flex flex-col items-center font-bold leading-none tracking-tight">
+                {pkg.compareAtPrice ? (
+                  <span className="text-[10px] font-semibold tracking-normal line-through opacity-70">R{pkg.compareAtPrice}</span>
+                ) : null}
+                <span className="flex items-center">
+                  <span className="text-2xl">R</span>
+                  <span className="text-2xl">{pkg.price}</span>
+                </span>
               </span>
             </div>
           </div>
@@ -146,27 +157,23 @@ export function PackageCard({
       </header>
 
       <div className="flex flex-1 flex-col px-6 pb-6 pt-1">
-        <ul className="space-y-2.5">
-          {services.map((feature) => {
-            const included = packageHasFeature(pkg, feature.id);
-            return (
-              <li key={feature.id} className="flex items-start gap-2.5">
-                <FeatureMark included={included} checkClass={theme.check} />
-                <span className={cn("text-[13px] leading-snug", included ? "text-ink" : "text-ink-soft/45")}>
-                  {feature.label}
-                </span>
-              </li>
-            );
-          })}
+        <ul className="mb-5 space-y-2.5">
+          {includedServices.map((feature) => (
+            <li key={feature.id} className="flex items-start gap-2.5">
+              <FeatureMark checkClass={theme.check} />
+              <span className="text-[13px] leading-snug text-ink">{feature.label}</span>
+            </li>
+          ))}
         </ul>
         <Link
           href={packageOrderHref(pkg.id)}
           onClick={(event) => event.stopPropagation()}
           className={cn(
-            "mt-4 inline-flex w-full items-center justify-center rounded-md px-4 py-2.5 text-xs font-bold uppercase tracking-[0.16em] transition-colors",
+            "mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-extrabold uppercase tracking-[0.12em] shadow-[0_10px_24px_rgba(2,6,23,0.28)] transition-colors",
             theme.button,
           )}
         >
+          <ShoppingBag className="size-4 shrink-0" strokeWidth={2.25} aria-hidden />
           Buy now
         </Link>
       </div>
@@ -186,7 +193,7 @@ export function PackagePricingGrid({
   services?: readonly { id: string; label: string }[];
 }) {
   return (
-    <div className="grid grid-cols-1 items-stretch gap-5 min-[717px]:grid-cols-2 lg:grid-cols-4 lg:items-end">
+    <div className="grid grid-cols-1 items-stretch gap-5 min-[717px]:grid-cols-2 lg:grid-cols-4">
       {items.map((pkg) => (
         <PackageCard
           key={pkg.id}

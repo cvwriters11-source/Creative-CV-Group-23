@@ -73,7 +73,7 @@ function HeroStat({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-xl border border-accent/40 bg-paper-deep/95 px-4 py-3 shadow-[0_8px_28px_rgba(37,99,235,0.18)] backdrop-blur-sm",
+        "flex items-center gap-3 rounded-xl border border-accent/40 bg-paper-deep/95 px-4 py-3 shadow-[0_8px_28px_rgba(198,161,91,0.16)] backdrop-blur-sm",
         className,
       )}
     >
@@ -94,7 +94,7 @@ export default function HomePage() {
 
         <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100dvh-5rem)] max-w-7xl items-start px-4 py-16 pb-28 sm:px-6 lg:items-center lg:px-8 lg:py-24 lg:pb-32">
           <div className="pointer-events-auto max-w-xl">
-            <p className="inline-flex rounded-full bg-accent px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink ring-1 ring-gold/50 backdrop-blur-sm">
+            <p className="inline-flex rounded-full bg-accent px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-on-accent ring-1 ring-gold/50 backdrop-blur-sm">
               Free lifetime CV amendments
             </p>
             <h1 className="mt-6 max-w-xl font-serif text-4xl font-semibold leading-[1.08] tracking-tight text-ink [text-shadow:0_2px_18px_rgba(0,0,0,0.45)] lg:text-5xl xl:text-6xl">
@@ -234,7 +234,7 @@ export default function HomePage() {
                 key={title}
                 className="flex gap-4 rounded-2xl border border-accent/30 bg-paper-deep p-6 shadow-[0_8px_28px_rgba(37,99,235,0.12)]"
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-ink">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent">
                   <Icon size={22} strokeWidth={2} aria-hidden />
                 </span>
                 <div>

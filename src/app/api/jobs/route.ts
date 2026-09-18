@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { inferProvince, normalizeJobType } from "@/lib/admin/jobs";
+import { inferProvince, normalizeJobType, optionalSalaryLabel } from "@/lib/admin/jobs";
 import { recordJob } from "@/lib/admin/store";
 import { getSessionUser } from "@/lib/session";
+import { isImageFile, saveJobLogo } from "@/lib/uploads";
 
 export const runtime = "nodejs";
 
@@ -10,32 +11,40 @@ export async function POST(request: Request) {
   if (!user || user.role !== "recruiter") {
     return NextResponse.json({ error: "Sign in as a recruiter to post a role." }, { status: 401 });
   }
-  const body = (await request.json()) as {
-    title?: string;
-    company?: string;
-    location?: string;
-    industry?: string;
-    type?: string;
-    salaryLabel?: string;
-    description?: string;
-  };
-  if (!body.title || !body.company || !body.location || !body.description) {
+
+  const form = await request.formData();
+  const title = String(form.get("title") ?? "").trim();
+  const company = String(form.get("company") ?? "").trim();
+  const location = String(form.get("location") ?? "").trim();
+  const description = String(form.get("description") ?? "").trim();
+  if (!title || !company || !location || !description) {
     return NextResponse.json({ error: "Title, company, location, and description are required." }, { status: 400 });
   }
 
+  const id = crypto.randomUUID();
+  const logo = form.get("logo");
+  let logoFileName = "";
+  if (logo instanceof File && logo.size > 0) {
+    if (!isImageFile(logo)) {
+      return NextResponse.json({ error: "Please upload a PNG, JPG, or WEBP logo." }, { status: 400 });
+    }
+    logoFileName = await saveJobLogo(id, logo);
+  }
+
   const job = await recordJob({
-    id: crypto.randomUUID(),
-    title: body.title,
-    company: body.company,
-    location: body.location,
-    province: inferProvince(body.location),
-    type: normalizeJobType(body.type || "Full-time"),
-    industry: body.industry || "Human Resources",
+    id,
+    title,
+    company,
+    location,
+    province: String(form.get("province") || inferProvince(location)),
+    type: normalizeJobType(String(form.get("type") || "Full-time")),
+    industry: String(form.get("industry") || "Human Resources"),
     salaryMin: null,
     salaryMax: null,
-    salaryLabel: body.salaryLabel || "Competitive",
+    salaryLabel: optionalSalaryLabel(form.get("salaryLabel")),
+    logoFileName: logoFileName || undefined,
     postedAt: new Date().toISOString(),
-    description: body.description,
+    description,
     requirements: [],
     published: true,
     source: "recruiter",
@@ -45,6 +54,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     jobId: job.id,
-    message: `“${body.title}” at ${body.company} is now live on the jobs board.`,
+    message: `“${title}” at ${company} is now live on the jobs board.`,
   });
 }

@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell } from "lucide-react";
 
 const titles: Array<{ match: (path: string) => boolean; title: string }> = [
   { match: (path) => path === "/admin", title: "Dashboard" },
@@ -18,25 +16,13 @@ const titles: Array<{ match: (path: string) => boolean; title: string }> = [
   { match: (path) => path.startsWith("/admin/settings"), title: "Settings" },
 ];
 
-export function AdminTopbar({ pendingCount }: { pendingCount: number }) {
+export function AdminTopbar() {
   const pathname = usePathname();
   const title = titles.find((item) => item.match(pathname))?.title ?? "Admin";
 
   return (
-    <header className="flex items-center justify-between border-b border-blue-400/20 bg-[#071422]/80 px-4 py-3 backdrop-blur-md lg:px-8">
+    <header className="flex items-center border-b border-accent/20 bg-[#07111a]/80 px-4 py-3 backdrop-blur-md lg:px-8">
       <h1 className="text-base font-semibold text-white">{title}</h1>
-      <Link
-        href="/admin/orders"
-        className="relative rounded-full p-2 text-sky-300 hover:bg-white/10 hover:text-white"
-        aria-label={pendingCount ? `${pendingCount} pending orders` : "Orders"}
-      >
-        <Bell size={18} />
-        {pendingCount > 0 ? (
-          <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-            {pendingCount > 99 ? "99+" : pendingCount}
-          </span>
-        ) : null}
-      </Link>
     </header>
   );
 }

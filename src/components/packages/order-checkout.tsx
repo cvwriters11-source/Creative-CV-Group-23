@@ -24,11 +24,11 @@ function parseAddons(value: string | null): AddonId[] {
 }
 
 const ribbonTones: Record<string, string> = {
-  gold: "#2563eb",
-  navy: "#0d9488",
-  charcoal: "#0f172a",
-  ink: "#1e6fff",
-  steel: "#0369a1",
+  gold: "#c6a15b",
+  navy: "#1b365d",
+  charcoal: "#10161f",
+  ink: "#1b365d",
+  steel: "#254675",
 };
 
 function IncludedMark() {
@@ -111,6 +111,10 @@ export function OrderCheckout({
             <p className="mt-1 font-sans text-[2.15rem] font-extrabold leading-none tracking-tight text-slate-900">
               {formatZar(pkg.price)}
             </p>
+            {pkg.compareAtPrice ? (
+              <p className="mt-1 text-sm font-semibold text-slate-400 line-through">{formatZar(pkg.compareAtPrice)}</p>
+            ) : null}
+            {pkg.promotion ? <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-accent">{pkg.promotion}</p> : null}
             <p className="mt-2 text-xs leading-snug text-slate-500">
               {pkg.turnaroundLabel}
               {pkg.africaOnly ? ` · ${africaOnlyLabel}` : ""}
@@ -177,7 +181,7 @@ export function OrderCheckout({
                     type="checkbox"
                     checked={active}
                     onChange={() => toggleAddon(addon.id)}
-                    className="mt-1 size-4 shrink-0 accent-[#2563eb]"
+                    className="mt-1 size-4 shrink-0 accent-[#c6a15b]"
                   />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline justify-between gap-3">

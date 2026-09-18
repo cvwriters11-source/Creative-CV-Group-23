@@ -12,6 +12,10 @@ export function inferProvince(location: string): string {
   return found ?? "Remote";
 }
 
+export function optionalSalaryLabel(value: unknown) {
+  return String(value ?? "").trim();
+}
+
 export async function getMergedJobs(includeUnpublished = false): Promise<AdminJob[]> {
   const store = await readAdminStore();
   const byId = new Map<string, AdminJob>();

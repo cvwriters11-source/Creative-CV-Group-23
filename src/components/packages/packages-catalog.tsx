@@ -45,15 +45,20 @@ function initialPackageId(requested: string | null): PackageId {
 
 function PackagesCatalog({
   items,
+  returnItems = returnClientPackages,
   services,
 }: {
   items: CatalogPackage[];
+  returnItems?: CatalogPackage[];
   services: { id: string; label: string }[];
 }) {
   const searchParams = useSearchParams();
   const [selected, setSelected] = useState<PackageId>(() => initialPackageId(searchParams.get("package")));
   const [selectedAddons, setSelectedAddons] = useState<AddonId[]>([]);
-  const selectedPackage = items.find((item) => item.id === selected) ?? items[0];
+  const selectedPackage =
+    items.find((item) => item.id === selected) ??
+    returnItems.find((item) => item.id === selected) ??
+    items[0];
 
   useEffect(() => {
     const requested = searchParams.get("package");
@@ -99,7 +104,7 @@ function PackagesCatalog({
         <h2 className="heading-accent font-serif text-2xl">Already a client?</h2>
         <p className="mt-2 text-ink-soft">Return edits for an existing Creative CV.</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          {returnClientPackages.map((item) => (
+          {returnItems.map((item) => (
             <button
               key={item.id}
               type="button"
@@ -110,7 +115,13 @@ function PackagesCatalog({
               )}
             >
               <h3 className="font-serif text-xl">{item.name}</h3>
-              <p className="mt-2 font-serif text-2xl">{formatZar(item.price)}</p>
+              <p className="mt-2 font-serif text-2xl">
+                {item.compareAtPrice ? (
+                  <span className="mr-2 text-lg text-ink-soft line-through">{formatZar(item.compareAtPrice)}</span>
+                ) : null}
+                {formatZar(item.price)}
+              </p>
+              {item.promotion ? <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-accent">{item.promotion}</p> : null}
               <p className="mt-2 text-sm text-ink-soft">
                 {item.turnaroundLabel}
                 {item.africaOnly ? ` · ${africaOnlyLabel}` : ""}
@@ -199,6 +210,7 @@ function PackagesCatalog({
 
 export function PackagesCatalogView(props: {
   items: CatalogPackage[];
+  returnItems?: CatalogPackage[];
   services: { id: string; label: string }[];
 }) {
   return (

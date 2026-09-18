@@ -25,7 +25,7 @@ export default async function JobsPage() {
         industry: row.industry,
         salaryMin: row.salary_min,
         salaryMax: row.salary_max,
-        salaryLabel: row.salary_label ?? "Competitive",
+        salaryLabel: row.salary_label ?? "",
         postedAt: row.posted_at,
         featured: row.featured,
         description: row.description,

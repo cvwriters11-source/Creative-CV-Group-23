@@ -74,9 +74,49 @@ export default async function AdminOverviewPage() {
           tone="amber"
           hint={metrics.pendingOrders > 0 ? "Requires attention" : undefined}
         />
+        <KpiCard
+          label="In review"
+          value={String(metrics.reviewOrders.length)}
+          icon={Clock3}
+          tone="amber"
+          hint={metrics.reviewOrders.length > 0 ? "Writer submitted a CV" : undefined}
+        />
+        <KpiCard
+          label="Corrections"
+          value={String(metrics.correctionOrders.length)}
+          icon={ClipboardList}
+          tone="purple"
+          hint={metrics.correctionOrders.length > 0 ? "Client changes waiting" : undefined}
+        />
         <KpiCard label="Completed Orders" value={String(metrics.completedOrders)} icon={CheckCircle2} tone="green" />
         <KpiCard label="Total Customers" value={String(metrics.totalCustomers)} icon={Users} tone="purple" />
       </div>
+
+      {metrics.reviewOrders.length > 0 || metrics.correctionOrders.length > 0 ? (
+        <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+          <div className="border-b border-slate-100 px-5 py-4">
+            <h2 className="text-base font-semibold text-slate-900">Writer queue</h2>
+            <p className="mt-1 text-sm text-slate-500">CVs waiting for approval and client corrections assigned to writers.</p>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {[...metrics.reviewOrders, ...metrics.correctionOrders].map((order) => (
+              <li key={order.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+                <div>
+                  <p className="font-medium text-slate-900">
+                    {order.fullName} · {order.orderNumber}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {order.status === "review" ? "In review" : "Corrections"} · {order.packageName}
+                  </p>
+                </div>
+                <Link href="/admin/orders" className="text-sm font-medium text-teal-600 hover:text-teal-700">
+                  Open orders
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
         <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">

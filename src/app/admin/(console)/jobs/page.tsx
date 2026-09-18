@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PublishToggle } from "@/components/admin/publish-toggle";
 import { AdminJobForm } from "@/components/admin/job-form";
+import { JobLogo } from "@/components/jobs/job-logo";
 import { formatAdminDay } from "@/lib/admin/format";
 import { getMergedJobs } from "@/lib/admin/jobs";
 
@@ -31,10 +32,16 @@ export default async function AdminJobsPage() {
             {jobs.map((job) => (
               <tr key={job.id} className="border-t border-line">
                 <td className="px-4 py-4">
-                  <p className="font-semibold text-ink">{job.title}</p>
-                  <p className="text-ink-soft">
-                    {job.company} · {job.location}
-                  </p>
+                  <div className="flex items-start gap-3">
+                    <JobLogo job={job} className="h-10 w-10" />
+                    <div>
+                      <p className="font-semibold text-ink">{job.title}</p>
+                      <p className="text-ink-soft">
+                        {job.company} · {job.location}
+                        {job.salaryLabel ? ` · ${job.salaryLabel}` : ""}
+                      </p>
+                    </div>
+                  </div>
                 </td>
                 <td className="px-4 py-4 capitalize text-ink-soft">{job.source}</td>
                 <td className="px-4 py-4">{job.published ? "Published" : "Unpublished"}</td>

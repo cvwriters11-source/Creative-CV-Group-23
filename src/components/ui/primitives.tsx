@@ -10,13 +10,13 @@ type Props = {
 
 export function ButtonLink({ href, children, variant = "ink", className }: Props) {
   const styles = {
-    ink: "bg-steel text-ink hover:bg-steel-hover",
-    accent: "bg-accent text-ink hover:bg-accent-hover",
+    ink: "bg-steel text-white hover:bg-steel-hover",
+    accent: "bg-accent text-on-accent hover:bg-accent-hover",
     ghost: "border border-accent/40 bg-transparent text-ink hover:border-accent hover:bg-accent-soft hover:text-ink",
     paper: "bg-paper-deep text-ink hover:bg-wash",
-    brand: "bg-brand text-ink hover:bg-brand-hover",
-    outline: "border-2 border-accent bg-transparent text-ink hover:bg-accent hover:text-ink",
-    outlineLight: "border-2 border-gold bg-transparent text-ink hover:bg-gold hover:text-ink",
+    brand: "bg-brand text-white hover:bg-brand-hover",
+    outline: "border-2 border-accent bg-transparent text-ink hover:bg-accent hover:text-on-accent",
+    outlineLight: "border-2 border-gold bg-transparent text-ink hover:bg-gold hover:text-on-accent",
   } as const;
 
   return (

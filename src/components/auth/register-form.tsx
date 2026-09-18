@@ -49,7 +49,7 @@ export function RegisterForm({ role }: { role: UserRole }) {
             {isRecruiter ? <input required name="company" placeholder="Company" className="field" /> : null}
             <input required type="email" name="email" placeholder="Email" className="field" />
             <input required type="password" name="password" minLength={8} placeholder="Password" className="field" />
-            <button type="submit" className="rounded-full bg-accent py-3 text-sm text-ink hover:bg-accent-hover">
+            <button type="submit" className="rounded-full bg-accent py-3 text-sm text-on-accent hover:bg-accent-hover">
               Create account
             </button>
           </form>

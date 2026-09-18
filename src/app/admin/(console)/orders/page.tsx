@@ -1,5 +1,5 @@
 import { AdminOrderPlanCard } from "@/components/admin/order-plan-card";
-import { readAdminStore } from "@/lib/admin/store";
+import { readAdminStore, toPublicWriter } from "@/lib/admin/store";
 import { getResolvedCatalog, getResolvedPackageServices } from "@/lib/catalog";
 
 export const metadata = { title: "Orders" };
@@ -11,11 +11,13 @@ export default async function AdminOrdersPage() {
     getResolvedPackageServices(),
   ]);
 
+  const writers = store.writers.map(toPublicWriter);
+
   return (
     <div className="mx-auto w-full max-w-4xl">
       <h1 className="text-2xl font-semibold text-white">Orders</h1>
       <p className="mt-1 text-sm text-slate-300">
-        Incoming package orders. Payment is only marked paid when you confirm it — Paystack is never assumed successful.
+        Assign a writer, review their upload, then approve to send the CV to the client. Corrections show here and on the writer dashboard.
       </p>
 
       {store.orders.length === 0 ? (
@@ -34,6 +36,7 @@ export default async function AdminOrdersPage() {
                 tabLabel={pkg?.headerName ?? order.packageName}
                 tone={pkg?.tone}
                 included={included}
+                writers={writers}
               />
             );
           })}

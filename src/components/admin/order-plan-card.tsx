@@ -1,22 +1,25 @@
 import { StatusSelect } from "@/components/admin/status-select";
+import { AdminOrderWorkflow } from "@/components/admin/order-workflow";
 import { formatAdminDate } from "@/lib/admin/format";
-import type { AdminOrder } from "@/lib/admin/types";
+import type { AdminOrder, PublicWriter } from "@/lib/admin/types";
 import { formatZar } from "@/lib/cn";
 import type { OrderUploadKind } from "@/lib/uploads";
 
 const ribbonTones: Record<string, string> = {
-  gold: "#38bdf8",
-  navy: "#2563eb",
-  charcoal: "#1d4ed8",
-  ink: "#3b82f6",
-  steel: "#0ea5e9",
+  gold: "#c6a15b",
+  navy: "#1b365d",
+  charcoal: "#10161f",
+  ink: "#1b365d",
+  steel: "#254675",
 };
 
 const statusOptions = [
   { value: "received", label: "Received" },
   { value: "pending_payment", label: "Pending payment" },
   { value: "paid", label: "Paid" },
-  { value: "in_progress", label: "In progress" },
+  { value: "in_progress", label: "Assigned" },
+  { value: "review", label: "In review" },
+  { value: "corrections", label: "Corrections" },
   { value: "complete", label: "Complete" },
 ];
 
@@ -67,20 +70,20 @@ function FileChip({
       : version.label === "PDF"
         ? "bg-rose-400/20 text-rose-200"
         : version.label === "Word"
-          ? "bg-blue-400/20 text-blue-200"
+          ? "bg-accent/20 text-accent"
           : "bg-white/10 text-slate-200";
   return (
-    <li className="flex w-full min-w-0 items-center gap-2 rounded-full border border-sky-300/25 bg-white/5 px-3 py-1.5 sm:w-auto">
+    <li className="flex w-full min-w-0 items-center gap-2 rounded-full border border-accent/25 bg-white/5 px-3 py-1.5 sm:w-auto">
       <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide ${badge}`}>
         {version.label}
       </span>
       <span className="min-w-0 truncate text-xs font-medium text-slate-100" title={fileName}>
         {fileName}
       </span>
-      <a href={href} target="_blank" rel="noreferrer" className="shrink-0 text-xs font-semibold text-sky-300 hover:text-white hover:underline">
+      <a href={href} target="_blank" rel="noreferrer" className="shrink-0 text-xs font-semibold text-accent hover:text-white hover:underline">
         Open
       </a>
-      <a href={`${href}?download=1`} className="shrink-0 text-xs font-semibold text-sky-300 hover:text-white hover:underline">
+      <a href={`${href}?download=1`} className="shrink-0 text-xs font-semibold text-accent hover:text-white hover:underline">
         Download
       </a>
     </li>
@@ -92,11 +95,13 @@ export function AdminOrderPlanCard({
   tabLabel,
   tone,
   included,
+  writers,
 }: {
   order: AdminOrder;
   tabLabel: string;
   tone?: string;
   included: string[];
+  writers: PublicWriter[];
 }) {
   const extras = extraItems(order.addonNames);
   const history = [...included, ...extras.map((item) => `${item} (extra)`)];
@@ -106,18 +111,18 @@ export function AdminOrderPlanCard({
       <p className="plan-pricing-tab">{tabLabel}</p>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
         <div className="min-w-0 sm:w-40 sm:shrink-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-300/80">Order total</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent/80">Order total</p>
           <p className="mt-1 font-sans text-[2rem] font-extrabold leading-none tracking-tight text-white">
             {formatZar(order.amount)}
           </p>
           <p className="mt-3 truncate text-sm font-semibold text-white">{order.fullName}</p>
-          <p className="text-xs font-semibold text-sky-300">{order.orderNumber ?? `Ref ${order.reference}`}</p>
+          <p className="text-xs font-semibold text-accent">{order.orderNumber ?? `Ref ${order.reference}`}</p>
           <p className="mt-1 break-all text-xs text-slate-300">{order.email}</p>
           <p className="text-xs text-slate-300">{order.phone}</p>
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-sky-300/80">Order history</p>
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-accent/80">Order history</p>
           <ul className="mt-2 grid gap-x-6 gap-y-2 sm:grid-cols-2">
             {history.length > 0 ? (
               history.map((item, index) => (
@@ -147,7 +152,10 @@ export function AdminOrderPlanCard({
         <FileChip orderId={order.id} kind="photo" fileName={order.photoFileName} />
         <FileChip orderId={order.id} kind="cv" fileName={order.cvFileName} />
         <FileChip orderId={order.id} kind="extra" fileName={order.extraFileName} />
+        <FileChip orderId={order.id} kind="delivery" fileName={order.deliveryFileName} />
       </ul>
+
+      <AdminOrderWorkflow order={order} writers={writers} />
 
       <p className="mt-3 text-xs text-slate-400">
         Received {formatAdminDate(order.createdAt)}

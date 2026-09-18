@@ -123,7 +123,7 @@ export function RecruitmentProcessVideo({
       <button
         type="button"
         onClick={toggle}
-        className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-white hover:bg-accent-hover"
+        className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent hover:bg-accent-hover"
         aria-label={playing ? "Pause" : "Play"}
       >
         {playing ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
@@ -228,7 +228,7 @@ export function RecruitmentProcessVideo({
           aria-label={playing ? "Pause recruitment process film" : "Play recruitment process film"}
         >
           {playing ? null : (
-            <span className="inline-flex size-16 items-center justify-center rounded-full bg-accent text-white shadow-lg">
+            <span className="inline-flex size-16 items-center justify-center rounded-full bg-accent text-on-accent shadow-lg">
               <Play size={28} fill="currentColor" className="ml-0.5" />
             </span>
           )}

@@ -73,7 +73,7 @@ export function OrderSuccessPhone({
           <p className="mt-4 text-center text-sm font-semibold leading-relaxed text-white [text-shadow:0_1px_2px_#000,0_0_14px_rgba(0,0,0,0.95)]">
             and your order number is
           </p>
-          <p className="mt-2 text-center font-sans text-3xl font-extrabold tracking-tight text-blue-300 [text-shadow:0_1px_2px_#000,0_0_16px_rgba(0,0,0,0.95)]">
+          <p className="mt-2 text-center font-sans text-3xl font-extrabold tracking-tight text-gold [text-shadow:0_1px_2px_#000,0_0_16px_rgba(0,0,0,0.95)]">
             {orderNumber}
           </p>
           <p className="mt-6 text-center text-sm font-semibold leading-relaxed text-white [text-shadow:0_1px_2px_#000,0_0_14px_rgba(0,0,0,0.95)]">

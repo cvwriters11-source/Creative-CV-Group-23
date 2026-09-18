@@ -173,7 +173,7 @@ export function GeneratorWizard() {
             <button
               type="button"
               onClick={() => setStep(index)}
-              className={`whitespace-nowrap rounded-full px-3 py-1 ${index === step ? "bg-accent text-ink" : "bg-paper text-ink-soft ring-1 ring-line-brand"}`}
+              className={`whitespace-nowrap rounded-full px-3 py-1 ${index === step ? "bg-accent text-on-accent" : "bg-paper text-ink-soft ring-1 ring-line-brand"}`}
             >
               {index + 1} {label}
             </button>
@@ -379,15 +379,15 @@ export function GeneratorWizard() {
               </button>
             ) : null}
             {step < steps.length - 1 ? (
-              <button type="submit" className="rounded-full bg-accent px-4 py-2 text-sm text-ink hover:bg-accent-hover">
+              <button type="submit" className="rounded-full bg-accent px-4 py-2 text-sm text-on-accent hover:bg-accent-hover">
                 Continue
               </button>
             ) : downloadUnlocked ? (
-              <button type="button" className="rounded-full bg-accent px-4 py-2 text-sm text-ink" onClick={downloadPaidPdf}>
+              <button type="button" className="rounded-full bg-accent px-4 py-2 text-sm text-on-accent" onClick={downloadPaidPdf}>
                 Download CV PDF
               </button>
             ) : (
-              <button type="button" className="rounded-full bg-accent px-4 py-2 text-sm text-ink" onClick={payToDownload} disabled={status === "paying"}>
+              <button type="button" className="rounded-full bg-accent px-4 py-2 text-sm text-on-accent" onClick={payToDownload} disabled={status === "paying"}>
                 {status === "paying" ? "Starting checkout…" : `Pay ${formatZar(generatorPrice)} to download PDF`}
               </button>
             )}

@@ -21,6 +21,10 @@ export function StatusSelect({
   const [current, setCurrent] = useState(value);
   const [saving, setSaving] = useState(false);
 
+  if (current !== value && !saving) {
+    setCurrent(value);
+  }
+
   async function onChange(next: string) {
     setCurrent(next);
     setSaving(true);

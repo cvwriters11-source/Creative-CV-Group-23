@@ -1,10 +1,27 @@
 import type { Job } from "@/lib/jobs";
+import type { PackageTurnaround } from "@/lib/packages";
 
-export type OrderStatus = "received" | "pending_payment" | "paid" | "in_progress" | "complete";
+export type OrderStatus =
+  | "received"
+  | "pending_payment"
+  | "paid"
+  | "in_progress"
+  | "review"
+  | "corrections"
+  | "complete";
 export type ContactStatus = "new" | "read" | "replied";
 export type GeneratorEventType = "pay_attempt" | "draft_complete" | "verify";
 export type ActivityType = "order" | "contact" | "application" | "job" | "user" | "generator" | "writer";
 export type JobSource = "seed" | "admin" | "recruiter";
+
+export type OrderCorrection = {
+  id: string;
+  createdAt: string;
+  message: string;
+  fileName?: string;
+  storedFileName?: string;
+  source: "admin" | "client";
+};
 
 export type AdminOrder = {
   id: string;
@@ -24,10 +41,14 @@ export type AdminOrder = {
   cvFileName: string;
   photoFileName?: string;
   extraFileName?: string;
+  deliveryFileName?: string;
   paymentConfigured: boolean;
   createdAt: string;
   completedAt?: string;
+  reviewedAt?: string;
+  approvedAt?: string;
   assignedWriterId?: string;
+  corrections?: OrderCorrection[];
 };
 
 export type AdminWriter = {
@@ -35,8 +56,11 @@ export type AdminWriter = {
   name: string;
   email: string;
   phone: string;
+  passwordHash?: string;
   createdAt: string;
 };
+
+export type PublicWriter = Omit<AdminWriter, "passwordHash"> & { hasPassword: boolean };
 
 export type AdminContact = {
   id: string;
@@ -117,4 +141,5 @@ export type AdminStore = {
   activity: ActivityItem[];
   packageServices?: PackageService[];
   packageServiceMap?: Record<string, string[]>;
+  packageMeta?: Record<string, PackageTurnaround>;
 };

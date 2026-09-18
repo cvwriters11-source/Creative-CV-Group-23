@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { PackagePricingGrid } from "@/components/packages/package-card";
 import { ButtonLink } from "@/components/ui/primitives";
-import { getResolvedPackageServices, getResolvedPrimaryPackages } from "@/lib/catalog";
+import { getResolvedPackageServices, getResolvedPrimaryPackages, getResolvedReturnPackages } from "@/lib/catalog";
 import { formatZar } from "@/lib/cn";
-import { africaOnlyLabel, addons, packageOrderHref, returnClientPackages } from "@/lib/packages";
+import { africaOnlyLabel, addons, packageOrderHref } from "@/lib/packages";
 
 export async function HomeCvPackages() {
   const items = await getResolvedPrimaryPackages();
+  const returnItems = await getResolvedReturnPackages();
   const services = await getResolvedPackageServices();
 
   return (
@@ -37,7 +38,7 @@ export async function HomeCvPackages() {
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {returnClientPackages.map((pkg) => (
+          {returnItems.map((pkg) => (
             <Link
               key={pkg.id}
               href={packageOrderHref(pkg.id)}
@@ -45,8 +46,14 @@ export async function HomeCvPackages() {
             >
               <div className="flex items-baseline justify-between gap-3">
                 <p className="font-medium">{pkg.name}</p>
-                <p className="font-serif text-lg font-bold">{formatZar(pkg.price)}</p>
+                <p className="text-right">
+                  {pkg.compareAtPrice ? (
+                    <span className="mr-2 text-sm text-ink-soft line-through">{formatZar(pkg.compareAtPrice)}</span>
+                  ) : null}
+                  <span className="font-serif text-lg font-bold">{formatZar(pkg.price)}</span>
+                </p>
               </div>
+              {pkg.promotion ? <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-accent">{pkg.promotion}</p> : null}
               <p className="mt-1 text-sm text-ink-soft">
                 {pkg.turnaroundLabel}
                 {pkg.africaOnly ? ` · ${africaOnlyLabel}` : ""}
