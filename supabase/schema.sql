@@ -155,3 +155,13 @@ create policy "no direct client order access"
 create policy "no direct client generator access"
   on public.generator_cvs for select
   using (false);
+
+-- Live public catalog (packages + jobs) is stored internally and read/written via RPCs.
+-- get_site_catalog() is public-read. set_site_catalog(payload, publish_key) requires the
+-- SHA-256 of "creative-cv-site-sync:{ADMIN_EMAIL}:{ADMIN_PASSWORD}".
+--
+-- create schema internal;
+-- create table internal.site_catalog (id text primary key, data jsonb not null, updated_at timestamptz);
+-- create table internal.site_publish_key (id int primary key, secret text not null);
+-- create function public.get_site_catalog() ...
+-- create function public.set_site_catalog(payload jsonb, publish_key text) ...

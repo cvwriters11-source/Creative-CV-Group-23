@@ -14,7 +14,7 @@ export default async function AdminJobsPage() {
     <div>
       <h1 className="text-2xl font-semibold text-slate-900">Job posts</h1>
       <p className="mt-1 text-sm text-slate-500">
-        Seeded board roles plus jobs posted by recruiters or by admin. You can post without a recruiter account.
+        Seeded board roles plus jobs posted by recruiters or by admin. Posted and published jobs go live on the public jobs board at the same time.
       </p>
 
       <div className="mt-6 overflow-x-auto rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">

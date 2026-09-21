@@ -1,4 +1,5 @@
 import { readAdminStore } from "@/lib/admin/store";
+import { loadPublicSite } from "@/lib/admin/public-site";
 import type { AdminJob } from "@/lib/admin/types";
 import { provinces, seedJobs, type Job } from "@/lib/jobs";
 
@@ -18,20 +19,25 @@ export function optionalSalaryLabel(value: unknown) {
 
 export async function getMergedJobs(includeUnpublished = false): Promise<AdminJob[]> {
   const store = await readAdminStore();
+  const remote = await loadPublicSite();
   const byId = new Map<string, AdminJob>();
+  const unpublished = new Set([
+    ...(store.unpublishedJobIds ?? []),
+    ...(remote?.unpublishedJobIds ?? []),
+  ]);
 
   for (const job of seedJobs) {
     byId.set(job.id, {
       ...job,
-      published: !store.unpublishedJobIds.includes(job.id),
+      published: !unpublished.has(job.id),
       source: "seed",
     });
   }
 
-  for (const job of store.jobs) {
+  for (const job of [...(remote?.jobs ?? []), ...store.jobs]) {
     byId.set(job.id, {
       ...job,
-      published: store.unpublishedJobIds.includes(job.id) ? false : job.published,
+      published: unpublished.has(job.id) ? false : job.published,
     });
   }
 

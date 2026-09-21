@@ -4,6 +4,7 @@ import type { Job } from "@/lib/jobs";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function JobsPage() {
   const jobsById = new Map((await getMergedJobs()).map((job) => [job.id, job as Job]));

@@ -26,6 +26,8 @@ import type {
   PublicWriter,
 } from "@/lib/admin/types";
 import { hashPassword } from "@/lib/passwords";
+import { applyPublicSiteSlice, loadPublicSite, publishPublicSite } from "@/lib/admin/public-site";
+import { revalidatePublicSite } from "@/lib/admin/revalidate-public";
 
 const emptyStore = (): AdminStore => ({
   orders: [],
@@ -81,12 +83,22 @@ async function resolvePath() {
   return primaryPath();
 }
 
+function hasLocalPublicData(store: AdminStore) {
+  return Boolean(
+    store.jobs.length ||
+      store.packageMeta ||
+      store.packageServiceMap ||
+      store.packageServices?.length,
+  );
+}
+
 async function readFromDisk(): Promise<AdminStore> {
   const filePath = await resolvePath();
+  let store = emptyStore();
   try {
     const raw = await fs.readFile(filePath, "utf8");
     const parsed = JSON.parse(raw) as Partial<AdminStore>;
-    return {
+    store = {
       ...emptyStore(),
       ...parsed,
       orders: parsed.orders ?? [],
@@ -103,8 +115,14 @@ async function readFromDisk(): Promise<AdminStore> {
       packageMeta: parsed.packageMeta,
     };
   } catch {
-    return emptyStore();
+    store = emptyStore();
   }
+
+  if (!hasLocalPublicData(store)) {
+    const remote = await loadPublicSite();
+    if (remote) store = applyPublicSiteSlice(store, remote);
+  }
+  return store;
 }
 
 async function writeToDisk(store: AdminStore) {
@@ -169,11 +187,18 @@ export async function findOrderByNumberAndEmail(orderNumber: string, email: stri
   );
 }
 
-export async function mutateAdminStore<T>(fn: (store: AdminStore) => T | Promise<T>): Promise<T> {
+export async function mutateAdminStore<T>(
+  fn: (store: AdminStore) => T | Promise<T>,
+  touchPublic = false,
+): Promise<T> {
   return enqueue(async () => {
     const store = await readFromDisk();
     const result = await fn(store);
     await writeToDisk(store);
+    if (touchPublic) {
+      await publishPublicSite(store);
+      revalidatePublicSite();
+    }
     return result;
   });
 }
@@ -415,7 +440,7 @@ export async function recordJob(input: AdminJob) {
       href: "/admin/jobs",
     });
     return job;
-  });
+  }, true);
 }
 
 export async function setJobPublished(id: string, published: boolean) {
@@ -428,7 +453,7 @@ export async function setJobPublished(id: string, published: boolean) {
       store.unpublishedJobIds.push(id);
     }
     return { id, published };
-  });
+  }, true);
 }
 
 export async function recordUser(input: Omit<AdminUser, "id" | "createdAt"> & { id?: string }) {
@@ -554,15 +579,16 @@ function resolvedPackageMeta(saved: Record<string, PackageTurnaround> | undefine
 
 export async function getPackageServiceCatalog() {
   const store = await readAdminStore();
+  const remote = await loadPublicSite();
+  const saved = store.packageServices ?? remote?.packageServices ?? [];
   const defaults = defaultPackageServices();
-  const saved = store.packageServices ?? [];
   const custom = saved.filter((item) => item.custom || !defaults.some((feature) => feature.id === item.id));
   const services = [...defaults, ...custom.filter((item) => item.custom)];
-  const map = { ...defaultPackageServiceMap(), ...(store.packageServiceMap ?? {}) };
+  const map = { ...defaultPackageServiceMap(), ...(remote?.packageServiceMap ?? {}), ...(store.packageServiceMap ?? {}) };
   for (const pkg of packages) {
     if (!map[pkg.id]) map[pkg.id] = [...pkg.features];
   }
-  return { services, map, meta: resolvedPackageMeta(store.packageMeta) };
+  return { services, map, meta: resolvedPackageMeta(store.packageMeta ?? remote?.packageMeta) };
 }
 
 export async function savePackageServiceCatalog(input: {
@@ -575,5 +601,5 @@ export async function savePackageServiceCatalog(input: {
     store.packageServiceMap = input.map;
     if (input.meta) store.packageMeta = resolvedPackageMeta(input.meta);
     return { services: store.packageServices, map: store.packageServiceMap, meta: resolvedPackageMeta(store.packageMeta) };
-  });
+  }, true);
 }

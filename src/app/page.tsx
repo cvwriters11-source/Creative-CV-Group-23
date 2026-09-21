@@ -19,6 +19,9 @@ import { ButtonLink } from "@/components/ui/primitives";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const reasons: { title: string; copy: string; icon: LucideIcon }[] = [
   {
     title: "Affordable Prices",
