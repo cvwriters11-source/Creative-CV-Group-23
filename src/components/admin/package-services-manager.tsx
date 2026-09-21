@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   addons,
   defaultPackageTurnaroundMap,
@@ -39,6 +39,9 @@ export function PackageServicesManager({ initial }: { initial: Catalog }) {
   const pkg = packages.find((item) => item.id === activeId) ?? packages[0];
   const meta = pkg ? catalog.meta[pkg.id] : undefined;
   const dirty = useMemo(() => JSON.stringify(catalog) !== JSON.stringify(saved), [catalog, saved]);
+  const catalogRef = useRef(catalog);
+  const saveGeneration = useRef(0);
+  catalogRef.current = catalog;
 
   function included(packageId: string, serviceId: string) {
     return (catalog.map[packageId] ?? []).includes(serviceId);
@@ -94,24 +97,36 @@ export function PackageServicesManager({ initial }: { initial: Catalog }) {
   }
 
   async function save() {
+    const snapshot = catalogRef.current;
+    const generation = ++saveGeneration.current;
     setSaving(true);
     setMessage("");
     const response = await fetch("/api/admin/package-services", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "save", services: catalog.services, map: catalog.map, meta: catalog.meta }),
+      body: JSON.stringify({ action: "save", services: snapshot.services, map: snapshot.map, meta: snapshot.meta }),
     });
     const payload = await response.json();
+    if (generation !== saveGeneration.current) return;
     setSaving(false);
     if (!response.ok) {
       setMessage(payload.error ?? "Could not save.");
       return;
     }
+    if (JSON.stringify(catalogRef.current) !== JSON.stringify(snapshot)) return;
     const next = withMeta(payload);
     setCatalog(next);
     setSaved(next);
-    setMessage("Saved. Public package cards now use these details.");
+    setMessage("Live on the website.");
   }
+
+  useEffect(() => {
+    if (!dirty) return;
+    const timer = window.setTimeout(() => {
+      void save();
+    }, 800);
+    return () => window.clearTimeout(timer);
+  }, [catalog, dirty]);
 
   async function addService(event: React.FormEvent) {
     event.preventDefault();

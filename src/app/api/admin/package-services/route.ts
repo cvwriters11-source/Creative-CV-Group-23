@@ -57,7 +57,14 @@ export async function POST(request: Request) {
       else next.delete(id);
       map[pkg.id] = [...next];
     }
-  await savePackageServiceCatalog({ services, map, meta: current.meta });
+    try {
+      await savePackageServiceCatalog({ services, map, meta: current.meta });
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : "Could not update the public website." },
+        { status: 502 },
+      );
+    }
     return NextResponse.json(await getPackageServiceCatalog());
   }
 
@@ -65,7 +72,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Services and package map are required." }, { status: 400 });
   }
 
-  await savePackageServiceCatalog({ services: body.services, map: body.map, meta: body.meta ?? current.meta });
+  try {
+    await savePackageServiceCatalog({ services: body.services, map: body.map, meta: body.meta ?? current.meta });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Could not update the public website." },
+      { status: 502 },
+    );
+  }
   return NextResponse.json(await getPackageServiceCatalog());
 }
 
@@ -88,6 +102,13 @@ export async function DELETE(request: Request) {
   const map = Object.fromEntries(
     Object.entries(current.map).map(([pkgId, ids]) => [pkgId, ids.filter((id) => id !== body.id)]),
   );
-  await savePackageServiceCatalog({ services, map, meta: current.meta });
+  try {
+    await savePackageServiceCatalog({ services, map, meta: current.meta });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Could not update the public website." },
+      { status: 502 },
+    );
+  }
   return NextResponse.json(await getPackageServiceCatalog());
 }

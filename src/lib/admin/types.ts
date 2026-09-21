@@ -142,4 +142,5 @@ export type AdminStore = {
   packageServices?: PackageService[];
   packageServiceMap?: Record<string, string[]>;
   packageMeta?: Record<string, PackageTurnaround>;
+  publicUpdatedAt?: string;
 };

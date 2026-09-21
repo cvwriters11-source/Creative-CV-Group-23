@@ -10,7 +10,7 @@ export default async function AdminPackagesPage() {
     <div className="min-w-0">
       <h1 className="text-2xl font-semibold text-slate-900">Packages</h1>
       <p className="mt-1 text-sm text-slate-500">
-        Pick a package, edit the name, price, turnaround, description, or a promotion, then save. The public website (home, packages, and checkout) updates as soon as you save.
+        Pick a package and edit the name, price, turnaround, description, or a promotion. Home, packages, and checkout update at the same time.
       </p>
       <div className="mt-6">
         <PackageServicesManager initial={catalog} />

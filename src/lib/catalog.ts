@@ -1,9 +1,9 @@
-import { unstable_noStore as noStore } from "next/cache";
+import { connection } from "next/server";
 import { getPackageServiceCatalog } from "@/lib/admin/store";
 import { applyPackageMeta, defaultPackageTurnaroundMap, packages, type CatalogPackage } from "@/lib/packages";
 
 export async function getResolvedCatalog(): Promise<CatalogPackage[]> {
-  noStore();
+  await connection();
   const { map, meta } = await getPackageServiceCatalog();
   const defaults = defaultPackageTurnaroundMap();
   return packages.map((pkg) =>
@@ -18,7 +18,7 @@ export async function getResolvedCatalog(): Promise<CatalogPackage[]> {
 }
 
 export async function getResolvedPackageServices() {
-  noStore();
+  await connection();
   const { services } = await getPackageServiceCatalog();
   return services.map(({ id, label }) => ({ id, label }));
 }

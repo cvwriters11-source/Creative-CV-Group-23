@@ -26,7 +26,7 @@ import type {
   PublicWriter,
 } from "@/lib/admin/types";
 import { hashPassword } from "@/lib/passwords";
-import { applyPublicSiteSlice, loadPublicSite, publishPublicSite } from "@/lib/admin/public-site";
+import { loadPublicSite, pickLivePublicSlice, publishPublicSite } from "@/lib/admin/public-site";
 import { revalidatePublicSite } from "@/lib/admin/revalidate-public";
 
 const emptyStore = (): AdminStore => ({
@@ -83,22 +83,12 @@ async function resolvePath() {
   return primaryPath();
 }
 
-function hasLocalPublicData(store: AdminStore) {
-  return Boolean(
-    store.jobs.length ||
-      store.packageMeta ||
-      store.packageServiceMap ||
-      store.packageServices?.length,
-  );
-}
-
 async function readFromDisk(): Promise<AdminStore> {
   const filePath = await resolvePath();
-  let store = emptyStore();
   try {
     const raw = await fs.readFile(filePath, "utf8");
     const parsed = JSON.parse(raw) as Partial<AdminStore>;
-    store = {
+    return {
       ...emptyStore(),
       ...parsed,
       orders: parsed.orders ?? [],
@@ -113,16 +103,11 @@ async function readFromDisk(): Promise<AdminStore> {
       packageServices: parsed.packageServices,
       packageServiceMap: parsed.packageServiceMap,
       packageMeta: parsed.packageMeta,
+      publicUpdatedAt: parsed.publicUpdatedAt,
     };
   } catch {
-    store = emptyStore();
+    return emptyStore();
   }
-
-  if (!hasLocalPublicData(store)) {
-    const remote = await loadPublicSite();
-    if (remote) store = applyPublicSiteSlice(store, remote);
-  }
-  return store;
 }
 
 async function writeToDisk(store: AdminStore) {
@@ -194,10 +179,16 @@ export async function mutateAdminStore<T>(
   return enqueue(async () => {
     const store = await readFromDisk();
     const result = await fn(store);
+    if (touchPublic) {
+      store.publicUpdatedAt = new Date().toISOString();
+    }
     await writeToDisk(store);
     if (touchPublic) {
-      await publishPublicSite(store);
+      const published = await publishPublicSite(store);
       revalidatePublicSite();
+      if (!published) {
+        throw new Error("Could not update the public website. Try save again.");
+      }
     }
     return result;
   });
@@ -579,16 +570,16 @@ function resolvedPackageMeta(saved: Record<string, PackageTurnaround> | undefine
 
 export async function getPackageServiceCatalog() {
   const store = await readAdminStore();
-  const remote = await loadPublicSite();
-  const saved = store.packageServices ?? remote?.packageServices ?? [];
+  const live = pickLivePublicSlice(store, await loadPublicSite());
+  const saved = live.packageServices ?? [];
   const defaults = defaultPackageServices();
   const custom = saved.filter((item) => item.custom || !defaults.some((feature) => feature.id === item.id));
   const services = [...defaults, ...custom.filter((item) => item.custom)];
-  const map = { ...defaultPackageServiceMap(), ...(remote?.packageServiceMap ?? {}), ...(store.packageServiceMap ?? {}) };
+  const map = { ...defaultPackageServiceMap(), ...(live.packageServiceMap ?? {}) };
   for (const pkg of packages) {
     if (!map[pkg.id]) map[pkg.id] = [...pkg.features];
   }
-  return { services, map, meta: resolvedPackageMeta(store.packageMeta ?? remote?.packageMeta) };
+  return { services, map, meta: resolvedPackageMeta(live.packageMeta) };
 }
 
 export async function savePackageServiceCatalog(input: {

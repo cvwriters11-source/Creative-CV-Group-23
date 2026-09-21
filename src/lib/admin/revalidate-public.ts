@@ -2,9 +2,9 @@ import { revalidatePath } from "next/cache";
 
 export function revalidatePublicSite() {
   revalidatePath("/", "layout");
-  revalidatePath("/packages");
+  revalidatePath("/packages", "layout");
   revalidatePath("/packages/order");
-  revalidatePath("/jobs");
+  revalidatePath("/jobs", "layout");
   revalidatePath("/jobs/[id]", "page");
   revalidatePath("/cv-generator");
 }
