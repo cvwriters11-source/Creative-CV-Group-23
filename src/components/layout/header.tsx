@@ -9,6 +9,7 @@ import { nav } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
 function isActive(pathname: string, href: string) {
+  if (href.startsWith("http")) return false;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
