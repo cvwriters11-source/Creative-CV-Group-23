@@ -104,48 +104,46 @@ export function PackageCard({
     >
       <header className="relative">
         <div className={cn("absolute inset-0 package-header-slant", theme.header)} />
-        <div className={cn("relative z-10 flex flex-col px-4 pt-4 sm:px-5 sm:pt-5", pkg.regionLabel ? "pb-8" : "pb-7")}>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1 pr-1 pt-0.5">
-              <h3 className={cn("font-sans text-xl font-bold uppercase leading-tight tracking-[0.03em]", theme.title)}>
-                {pkg.headerName}
-              </h3>
-              {pkg.promotion ? (
-                <p className={cn("mt-1 text-[11px] font-semibold uppercase tracking-[0.14em]", theme.muted)}>{pkg.promotion}</p>
-              ) : featured ? (
-                <p className={cn("mt-1 text-[11px] font-semibold uppercase tracking-[0.16em]", theme.muted)}>Most popular</p>
-              ) : null}
-              {featured && pkg.promotion ? (
-                <p className={cn("mt-0.5 text-[11px] font-semibold uppercase tracking-[0.16em]", theme.muted)}>Most popular</p>
-              ) : null}
-              <p className={cn("mt-1.5 text-[13.5px] font-medium leading-snug", theme.muted)}>{pkg.turnaroundLabel}</p>
-              {pkg.africaOnly ? (
-                <span className={cn("mt-1.5 inline-flex whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-semibold uppercase leading-none tracking-[0.08em]", theme.badge)}>
-                  {africaOnlyHeaderLabel}
-                </span>
-              ) : null}
-            </div>
-            <div
-              className={cn(
-                "flex size-16 shrink-0 items-center justify-center rounded-full ring-2 sm:size-[5.15rem]",
-                theme.price,
-              )}
-              aria-label={`${pkg.name} price R${pkg.price}`}
-            >
-              <span className="flex flex-col items-center font-bold leading-none tracking-tight">
-                {pkg.compareAtPrice ? (
-                  <span className="text-[10px] font-semibold tracking-normal line-through opacity-70">R{pkg.compareAtPrice}</span>
-                ) : null}
-                <span className="flex items-center">
-                  <span className="text-xl sm:text-2xl">R</span>
-                  <span className="text-xl sm:text-2xl">{pkg.price}</span>
-                </span>
+        <div className="relative z-10 flex items-start gap-3 px-4 pb-5 pt-4 sm:px-5 sm:pb-6 sm:pt-5">
+          <div className="min-w-0 flex-1 space-y-1">
+            <h3 className={cn("font-sans text-xl font-bold uppercase leading-tight tracking-[0.03em]", theme.title)}>
+              {pkg.headerName}
+            </h3>
+            {pkg.promotion ? (
+              <p className={cn("text-[11px] font-semibold uppercase tracking-[0.14em]", theme.muted)}>{pkg.promotion}</p>
+            ) : featured ? (
+              <p className={cn("text-[11px] font-semibold uppercase tracking-[0.16em]", theme.muted)}>Most popular</p>
+            ) : null}
+            {featured && pkg.promotion ? (
+              <p className={cn("text-[11px] font-semibold uppercase tracking-[0.16em]", theme.muted)}>Most popular</p>
+            ) : null}
+            <p className={cn("text-[13.5px] font-medium leading-snug", theme.muted)}>{pkg.turnaroundLabel}</p>
+            {pkg.africaOnly ? (
+              <span className={cn("inline-flex whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-semibold uppercase leading-none tracking-[0.08em]", theme.badge)}>
+                {africaOnlyHeaderLabel}
               </span>
-            </div>
+            ) : null}
+            {pkg.regionLabel ? (
+              <p className={cn("text-[13px] font-medium leading-snug", theme.muted)}>{pkg.regionLabel}</p>
+            ) : null}
           </div>
-          {pkg.regionLabel ? (
-            <p className={cn("mt-1.5 text-[13px] font-medium leading-snug", theme.muted)}>{pkg.regionLabel}</p>
-          ) : null}
+          <div
+            className={cn(
+              "flex size-16 shrink-0 items-center justify-center rounded-full ring-2 sm:size-[5.15rem]",
+              theme.price,
+            )}
+            aria-label={`${pkg.name} price R${pkg.price}`}
+          >
+            <span className="flex flex-col items-center font-bold leading-none tracking-tight">
+              {pkg.compareAtPrice ? (
+                <span className="text-[10px] font-semibold tracking-normal line-through opacity-70">R{pkg.compareAtPrice}</span>
+              ) : null}
+              <span className="flex items-center">
+                <span className="text-xl sm:text-2xl">R</span>
+                <span className="text-xl sm:text-2xl">{pkg.price}</span>
+              </span>
+            </span>
+          </div>
         </div>
       </header>
 
