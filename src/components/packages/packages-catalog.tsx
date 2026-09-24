@@ -83,7 +83,7 @@ function PackagesCatalog({
 
   return (
     <div className="bg-paper">
-    <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8">
+    <div className="mx-auto max-w-6xl overflow-x-hidden px-4 py-12 sm:px-5 sm:py-16 lg:px-8">
       <PageIntro
         eyebrow="CV Packages"
         title="Take the next step in your career with one of our packages below"

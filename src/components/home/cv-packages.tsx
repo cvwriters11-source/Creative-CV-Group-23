@@ -12,7 +12,7 @@ export async function HomeCvPackages() {
 
   return (
     <section id="cv-packages" className="bg-gold-soft/70">
-      <div className="mx-auto max-w-6xl px-5 pt-12 pb-20 lg:px-8">
+      <div className="mx-auto max-w-6xl overflow-x-hidden px-4 pt-10 pb-16 sm:px-5 sm:pt-12 sm:pb-20 lg:px-8">
       <p className="kicker">CV packages</p>
       <h2 className="mt-3 max-w-2xl font-serif text-4xl font-bold tracking-tight md:text-5xl">
         Choose your CV package

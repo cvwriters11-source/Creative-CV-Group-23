@@ -95,7 +95,7 @@ export function PackageCard({
   return (
     <article
       className={cn(
-        "flex flex-col overflow-hidden rounded-[1.35rem] border border-accent/35 bg-paper-deep shadow-[0_14px_40px_rgba(2,6,23,0.45)] transition-[transform,box-shadow] duration-200",
+        "flex w-full min-w-0 flex-col overflow-hidden rounded-[1.35rem] border border-accent/35 bg-paper-deep shadow-[0_14px_40px_rgba(2,6,23,0.45)] transition-[transform,box-shadow] duration-200",
         featured && "lg:shadow-[0_22px_50px_rgba(198,161,91,0.22)]",
         selected && cn("ring-2 ring-offset-2 ring-offset-paper", theme.ring),
         onSelect && "cursor-pointer",
@@ -104,8 +104,8 @@ export function PackageCard({
     >
       <header className="relative">
         <div className={cn("absolute inset-0 package-header-slant", theme.header)} />
-        <div className={cn("relative z-10 flex flex-col px-5 pt-5", pkg.regionLabel ? "pb-8" : "pb-7")}>
-          <div className="flex items-start justify-between gap-2">
+        <div className={cn("relative z-10 flex flex-col px-4 pt-4 sm:px-5 sm:pt-5", pkg.regionLabel ? "pb-8" : "pb-7")}>
+          <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1 pr-1 pt-0.5">
               <h3 className={cn("font-sans text-xl font-bold uppercase leading-tight tracking-[0.03em]", theme.title)}>
                 {pkg.headerName}
@@ -127,7 +127,7 @@ export function PackageCard({
             </div>
             <div
               className={cn(
-                "flex size-[5.15rem] shrink-0 items-center justify-center rounded-full ring-2",
+                "flex size-16 shrink-0 items-center justify-center rounded-full ring-2 sm:size-[5.15rem]",
                 theme.price,
               )}
               aria-label={`${pkg.name} price R${pkg.price}`}
@@ -137,24 +137,24 @@ export function PackageCard({
                   <span className="text-[10px] font-semibold tracking-normal line-through opacity-70">R{pkg.compareAtPrice}</span>
                 ) : null}
                 <span className="flex items-center">
-                  <span className="text-2xl">R</span>
-                  <span className="text-2xl">{pkg.price}</span>
+                  <span className="text-xl sm:text-2xl">R</span>
+                  <span className="text-xl sm:text-2xl">{pkg.price}</span>
                 </span>
               </span>
             </div>
           </div>
           {pkg.regionLabel ? (
-            <p className={cn("mt-1.5 max-w-[16rem] text-[13px] font-medium leading-snug", theme.muted)}>{pkg.regionLabel}</p>
+            <p className={cn("mt-1.5 text-[13px] font-medium leading-snug", theme.muted)}>{pkg.regionLabel}</p>
           ) : null}
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col px-6 pb-6 pt-1">
+      <div className="flex flex-1 flex-col px-4 pb-5 pt-1 sm:px-6 sm:pb-6">
         <ul className="mb-4 space-y-2">
           {includedServices.map((feature) => (
-            <li key={feature.id} className="flex items-start gap-2.5">
+            <li key={feature.id} className="flex min-w-0 items-start gap-2.5">
               <FeatureMark checkClass={theme.check} />
-              <span className="text-[13px] leading-snug text-ink">{feature.label}</span>
+              <span className="min-w-0 break-words text-[13px] leading-snug text-ink">{feature.label}</span>
             </li>
           ))}
         </ul>
@@ -186,7 +186,7 @@ export function PackagePricingGrid({
   services?: readonly { id: string; label: string }[];
 }) {
   return (
-    <div className="grid grid-cols-1 items-stretch gap-5 min-[717px]:grid-cols-2 lg:grid-cols-4">
+    <div className="grid w-full min-w-0 grid-cols-1 items-stretch gap-4 sm:gap-5 lg:grid-cols-4">
       {items.map((pkg) => (
         <PackageCard
           key={pkg.id}

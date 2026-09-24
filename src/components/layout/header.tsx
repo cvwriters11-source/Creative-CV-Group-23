@@ -51,7 +51,7 @@ export function Header() {
           <BrandLogo className="h-12 w-auto object-contain object-left sm:h-14 lg:h-16" />
         </Link>
 
-        <nav className="hidden min-w-0 flex-1 items-center justify-end gap-1 sm:flex sm:flex-nowrap md:gap-1.5 lg:justify-center lg:gap-2">
+        <nav className="hidden min-w-0 flex-1 items-center justify-end gap-1 lg:flex lg:flex-nowrap lg:justify-center lg:gap-2">
           {nav.map((item) => (
             <Link
               key={item.href}
@@ -94,7 +94,7 @@ export function Header() {
 
         <button
           type="button"
-          className="relative z-10 shrink-0 rounded-full border border-accent/50 bg-white p-2 text-[#020617] hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 sm:hidden"
+          className="relative z-10 shrink-0 rounded-full border border-accent/50 bg-white p-2 text-[#020617] hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 lg:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="mobile-nav"
@@ -104,7 +104,7 @@ export function Header() {
         </button>
       </div>
       {open ? (
-        <div id="mobile-nav" className="border-t border-slate-200 bg-white px-5 py-5 sm:hidden">
+        <div id="mobile-nav" className="border-t border-slate-200 bg-white px-5 py-5 lg:hidden">
           <nav className="flex flex-col gap-2.5">
             {nav.map((item) => (
               <Link
