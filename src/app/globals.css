@@ -36,10 +36,6 @@
   clip-path: polygon(0 0, 100% 0, 100% 58%, 0 100%);
 }
 
-.package-header-slant-tall {
-  clip-path: polygon(0 0, 100% 0, 100% 78%, 0 100%);
-}
-
 html {
   scroll-behavior: smooth;
   color-scheme: dark;

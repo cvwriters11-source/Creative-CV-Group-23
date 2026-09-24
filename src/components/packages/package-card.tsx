@@ -7,7 +7,6 @@ import {
   africaOnlyHeaderLabel,
   comparisonFeatures,
   packageHasFeature,
-  packageHasPromotion,
   packageOrderHref,
   type CatalogPackage,
   type PackageId,
@@ -103,15 +102,9 @@ export function PackageCard({
       )}
       onClick={onSelect ? () => onSelect(pkg.id) : undefined}
     >
-      <header className={cn("relative", pkg.regionLabel || packageHasPromotion(pkg) ? "h-[14.25rem]" : featured ? "h-[11.75rem]" : "h-[10.5rem]")}>
-        <div
-          className={cn(
-            "absolute inset-0",
-            pkg.regionLabel ? "package-header-slant-tall" : "package-header-slant",
-            theme.header,
-          )}
-        />
-        <div className="relative z-10 flex h-full flex-col px-5 pt-5">
+      <header className="relative">
+        <div className={cn("absolute inset-0 package-header-slant", theme.header)} />
+        <div className={cn("relative z-10 flex flex-col px-5 pt-5", pkg.regionLabel ? "pb-8" : "pb-7")}>
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1 pr-1 pt-0.5">
               <h3 className={cn("font-sans text-xl font-bold uppercase leading-tight tracking-[0.03em]", theme.title)}>
@@ -151,13 +144,13 @@ export function PackageCard({
             </div>
           </div>
           {pkg.regionLabel ? (
-            <p className={cn("mt-2 text-[13px] font-medium leading-snug", theme.muted)}>{pkg.regionLabel}</p>
+            <p className={cn("mt-1.5 max-w-[16rem] text-[13px] font-medium leading-snug", theme.muted)}>{pkg.regionLabel}</p>
           ) : null}
         </div>
       </header>
 
       <div className="flex flex-1 flex-col px-6 pb-6 pt-1">
-        <ul className="mb-5 space-y-2.5">
+        <ul className="mb-4 space-y-2">
           {includedServices.map((feature) => (
             <li key={feature.id} className="flex items-start gap-2.5">
               <FeatureMark checkClass={theme.check} />
