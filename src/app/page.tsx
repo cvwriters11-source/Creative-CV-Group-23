@@ -125,7 +125,7 @@ export default function HomePage() {
                 View Packages
               </ButtonLink>
               <ButtonLink href="/cv-generator" variant="outlineLight" className="px-8 py-4 text-base shadow-lg">
-                Generate CV
+                ATS Tester
               </ButtonLink>
               <ButtonLink href="/jobs" variant="brand" className="px-8 py-4 text-base shadow-lg">
                 <Briefcase size={18} />

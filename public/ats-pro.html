@@ -4,11 +4,34 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/logo.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CV Generator · Creative CV</title>
+    <title>ATS Tester · Creative CV</title>
     <script type="module" crossorigin src="/assets/index-CnT_dTmB.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-BVa9iQI8.css" />
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      document.addEventListener(
+        "click",
+        function (event) {
+          const button = event.target.closest("nav button, nav a");
+          if (!button) return;
+          const label = (button.textContent || "").replace(/\s+/g, " ").trim();
+          if (label !== "Home") return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          try {
+            if (window.top && window.top !== window) {
+              window.top.location.assign("/");
+            } else {
+              window.location.assign("/");
+            }
+          } catch (err) {
+            window.location.assign("/");
+          }
+        },
+        true
+      );
+    </script>
   </body>
 </html>

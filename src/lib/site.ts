@@ -22,7 +22,7 @@ export const site = {
 
 export const nav = [
   { href: "/jobs", label: "Find Jobs" },
-  { href: "/cv-generator", label: "CV Generator" },
+  { href: "/cv-generator", label: "ATS Tester" },
   { href: "/packages", label: "CV Packages" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
