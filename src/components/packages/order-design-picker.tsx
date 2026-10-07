@@ -103,7 +103,10 @@ export function OrderDesignPicker({
           best = id as CvColorId;
         }
       });
-      if (best) setColor((current) => (current === best ? current : best));
+      if (isCvColorId(best ?? "")) {
+        const nextColor = best as CvColorId;
+        setColor((current) => (current === nextColor ? current : nextColor));
+      }
     };
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(syncFromScroll);
