@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { WriterLogoutButton } from "@/components/writer/logout-button";
 import { getWriterSession } from "@/lib/writer/session";
@@ -20,7 +21,18 @@ export default async function WriterPortalLayout({ children }: { children: React
               <p className="text-sm font-semibold text-white">{session.name}</p>
             </div>
           </div>
-          <WriterLogoutButton />
+          <nav className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.12em]">
+            <Link href="/writer" className="rounded-full px-3 py-1.5 text-slate-300 hover:bg-white/10 hover:text-white">
+              Orders
+            </Link>
+            <Link href="/writer/chat" className="rounded-full px-3 py-1.5 text-slate-300 hover:bg-white/10 hover:text-white">
+              Chat
+            </Link>
+            <Link href="/writer/storage" className="rounded-full px-3 py-1.5 text-slate-300 hover:bg-white/10 hover:text-white">
+              Storage
+            </Link>
+            <WriterLogoutButton />
+          </nav>
         </div>
       </header>
       <div className="mx-auto max-w-5xl px-4 py-8">{children}</div>

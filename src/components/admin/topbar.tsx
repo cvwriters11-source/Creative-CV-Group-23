@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 const titles: Array<{ match: (path: string) => boolean; title: string }> = [
   { match: (path) => path === "/admin", title: "Dashboard" },
   { match: (path) => path.startsWith("/admin/orders"), title: "Orders" },
+  { match: (path) => path.startsWith("/admin/chat"), title: "Team chat" },
+  { match: (path) => path.startsWith("/admin/storage"), title: "Storage" },
+  { match: (path) => path.startsWith("/admin/meetings"), title: "Meetings" },
   { match: (path) => path.startsWith("/admin/customers") || path.startsWith("/admin/contacts"), title: "Customers" },
   { match: (path) => path.startsWith("/admin/recruiters"), title: "Recruiters" },
   { match: (path) => path.startsWith("/admin/job-seekers") || path.startsWith("/admin/applications") || path.startsWith("/admin/users"), title: "Job Seekers" },

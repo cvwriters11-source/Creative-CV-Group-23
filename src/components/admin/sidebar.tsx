@@ -5,7 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Briefcase,
+  FolderOpen,
   Home,
+  MessageSquare,
   Package,
   PenLine,
   Settings,
@@ -14,6 +16,7 @@ import {
   UserRound,
   Users,
   ClipboardList,
+  Video,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { AdminLogoutButton } from "@/components/admin/logout-button";
@@ -21,6 +24,9 @@ import { AdminLogoutButton } from "@/components/admin/logout-button";
 const links = [
   { href: "/admin", label: "Dashboard", icon: Home },
   { href: "/admin/orders", label: "Orders", icon: ClipboardList },
+  { href: "/admin/chat", label: "Chat", icon: MessageSquare },
+  { href: "/admin/storage", label: "Storage", icon: FolderOpen },
+  { href: "/admin/meetings", label: "Meetings", icon: Video },
   { href: "/admin/customers", label: "Customers", icon: Users, aliases: ["/admin/contacts"] },
   { href: "/admin/recruiters", label: "Recruiters", icon: UserRound },
   { href: "/admin/job-seekers", label: "Job Seekers", icon: Users, aliases: ["/admin/applications", "/admin/users"] },
@@ -38,7 +44,15 @@ function isActivePath(pathname: string, href: string, aliases?: string[]) {
   return Boolean(aliases?.some((alias) => pathname === alias || pathname.startsWith(`${alias}/`)));
 }
 
-export function AdminSidebar({ email, pendingCount }: { email: string; pendingCount: number }) {
+export function AdminSidebar({
+  email,
+  pendingCount,
+  meetingPendingCount,
+}: {
+  email: string;
+  pendingCount: number;
+  meetingPendingCount: number;
+}) {
   const pathname = usePathname();
 
   return (
@@ -67,7 +81,9 @@ export function AdminSidebar({ email, pendingCount }: { email: string; pendingCo
                     aria-label={
                       item.href === "/admin" && pendingCount > 0
                         ? `Dashboard, ${pendingCount} pending orders`
-                        : undefined
+                        : item.href === "/admin/meetings" && meetingPendingCount > 0
+                          ? `Meetings, ${meetingPendingCount} pending requests`
+                          : undefined
                     }
                     className={cn(
                       "relative flex min-h-9 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold leading-tight tracking-tight whitespace-nowrap transition-colors",
@@ -81,6 +97,11 @@ export function AdminSidebar({ email, pendingCount }: { email: string; pendingCo
                     {item.href === "/admin" && pendingCount > 0 ? (
                       <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
                         {pendingCount > 99 ? "99+" : pendingCount}
+                      </span>
+                    ) : null}
+                    {item.href === "/admin/meetings" && meetingPendingCount > 0 ? (
+                      <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+                        {meetingPendingCount > 99 ? "99+" : meetingPendingCount}
                       </span>
                     ) : null}
                   </Link>

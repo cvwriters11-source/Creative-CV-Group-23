@@ -3,12 +3,15 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { OrderDesignPicker } from "@/components/packages/order-design-picker";
 import { OrderForm } from "@/components/packages/order-form";
 import { PageIntro } from "@/components/ui/primitives";
 import { cn, formatZar } from "@/lib/cn";
+import { formatCvDesign, parseCvColor, parseCvTemplate } from "@/lib/cv-design";
 import {
   addons,
   africaOnlyLabel,
+  packageOrderHref,
   type AddonId,
   type CatalogPackage,
   type PackageId,
@@ -55,7 +58,12 @@ export function OrderCheckout({
     catalog.find((item) => item.id === "professional") ??
     catalog[0];
   const [selectedAddons, setSelectedAddons] = useState<AddonId[]>(() => parseAddons(searchParams.get("addons")));
+  const cvTemplate = parseCvTemplate(searchParams.get("template")) ?? "classic";
+  const cvColor = parseCvColor(searchParams.get("color")) ?? "navy-blue";
+  const requestedStep = searchParams.get("step");
+  const designStep: "colour" | "details" = requestedStep === "details" ? "details" : "colour";
   const paid = searchParams.get("paid");
+  const designLabel = formatCvDesign(cvTemplate ?? undefined, cvColor);
 
   const includedServices = useMemo(
     () => services.filter((feature) => pkg.features.includes(feature.id)),
@@ -97,12 +105,29 @@ export function OrderCheckout({
     <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8">
       <PageIntro
         eyebrow="Buy now"
-        title="Tell us who you are"
-        lede="Fill in your details, upload your picture and CV, then continue to payment. Additional files are optional."
+        title={designStep === "colour" ? "Choose the CV you want" : "Tell us who you are"}
+        lede={
+          designStep === "colour"
+            ? "Each sample is the full two-page International Resume PDF in a different colour. Scroll the pages, pick the one you want, then continue."
+            : "Fill in your details, upload your picture and CV, then complete a short career assessment. Payment comes after that."
+        }
       />
+      <p className="mt-5 text-sm text-ink-soft">
+        {pkg.headerName} · {formatZar(pkg.price)}
+        {pkg.africaOnly ? ` · ${africaOnlyLabel}` : ""}
+      </p>
+      {designStep !== "details" ? (
+        <OrderDesignPicker
+          initialColor={cvColor}
+          packageId={pkg.id as PackageId}
+          addonIds={selectedAddons}
+        />
+      ) : (
+      <>
       <article
         className="plan-pricing-card mt-10"
         style={{ ["--plan-tab" as string]: ribbonTones[pkg.tone] ?? ribbonTones.gold }}
+        suppressHydrationWarning
       >
         <p className="plan-pricing-tab">{pkg.headerName}</p>
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-8">
@@ -122,15 +147,23 @@ export function OrderCheckout({
           </div>
           <ul className="flex min-w-0 flex-1 flex-wrap items-center gap-x-7 gap-y-2.5">
             {includedServices.map((feature) => (
-              <li key={feature.id} className="flex max-w-[16rem] items-center gap-2 text-[13px] leading-snug text-slate-600">
+              <li
+                key={feature.id}
+                className="flex max-w-[16rem] items-center gap-2 text-[13px] leading-snug text-slate-600"
+                suppressHydrationWarning
+              >
                 <IncludedMark />
-                <span>{feature.label}</span>
+                <span suppressHydrationWarning>{feature.label}</span>
               </li>
             ))}
             {selectedAddonItems.map((addon) => (
-              <li key={addon.id} className="flex max-w-[16rem] items-center gap-2 text-[13px] leading-snug text-slate-600">
+              <li
+                key={addon.id}
+                className="flex max-w-[16rem] items-center gap-2 text-[13px] leading-snug text-slate-600"
+                suppressHydrationWarning
+              >
                 <IncludedMark />
-                <span>
+                <span suppressHydrationWarning>
                   {addon.name} · {formatZar(addon.price)}
                 </span>
               </li>
@@ -162,6 +195,22 @@ export function OrderCheckout({
           </div>
         </div>
       </article>
+      {designLabel ? (
+        <p className="mt-4 text-sm text-ink-soft">
+          Selected look: <span className="font-semibold text-ink">{designLabel}</span>
+          {" · "}
+          <a
+            href={packageOrderHref(pkg.id as PackageId, selectedAddons, {
+              template: "classic",
+              color: cvColor,
+              step: "colour",
+            })}
+            className="content-link"
+          >
+            Change
+          </a>
+        </p>
+      ) : null}
       <div className="mt-10 grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div id="additional-services" className="scroll-mt-28">
           <p className="text-sm font-semibold">Additional services</p>
@@ -218,9 +267,13 @@ export function OrderCheckout({
             addonIds={selectedAddons}
             packageName={pkg.name}
             total={total}
+            cvTemplate={cvTemplate}
+            cvColor={cvColor}
           />
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

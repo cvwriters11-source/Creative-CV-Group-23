@@ -14,13 +14,13 @@ import {
 } from "@/lib/packages";
 import { cn, formatZar } from "@/lib/cn";
 import { PackagePricingGrid } from "@/components/packages/package-card";
-import { ButtonLink, PageIntro } from "@/components/ui/primitives";
+import { PageIntro } from "@/components/ui/primitives";
 
 const steps = [
   {
     n: "01",
     title: "Choose your package and place your order.",
-    copy: "Buy now takes you to a short form: name, surname, phone with country code, email, your picture, your CV, and an optional extra file.",
+    copy: "Buy now lets you choose a CV template and colour first, then a short form: name, surname, phone, email, your picture, and your CV.",
   },
   {
     n: "02",
@@ -94,7 +94,13 @@ function PackagesCatalog({
         <h2 className="heading-accent font-serif text-3xl">Our packages</h2>
         <p className="mt-2 text-ink-soft">Who each package is for, turnaround, and what’s included — prices in ZAR.</p>
         <div className="mt-10">
-          <PackagePricingGrid items={items} selectedId={selected} onSelect={setSelected} services={services} />
+          <PackagePricingGrid
+            items={items}
+            selectedId={selected}
+            onSelect={setSelected}
+            services={services}
+            addonIds={selectedAddons}
+          />
         </div>
       </section>
     </div>
@@ -196,11 +202,16 @@ function PackagesCatalog({
           <h3 className="mt-2 font-serif text-2xl">{selectedPackage?.name}</h3>
           <p className="mt-1 text-ink-soft">Total {formatZar(total)}</p>
           <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-            Next you’ll add your name, surname, phone with country code, email, a picture, your CV, and an optional extra file.
+            Next you’ll choose a template and colour, then add your name, surname, phone, email, a picture, and your CV.
           </p>
-          <ButtonLink href={packageOrderHref(selected, selectedAddons)} variant="accent" className="mt-6 w-full">
-            Fill in your details
-          </ButtonLink>
+          {selectedPackage ? (
+            <a
+              href={packageOrderHref(selectedPackage.id, selectedAddons)}
+              className="mt-6 flex w-full items-center justify-center rounded-full bg-accent px-5 py-3 text-sm font-semibold text-on-accent hover:bg-accent-hover"
+            >
+              Choose template
+            </a>
+          ) : null}
         </div>
         </div>
       </section>

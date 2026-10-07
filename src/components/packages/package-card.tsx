@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Check, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/cn";
 import {
@@ -8,6 +7,7 @@ import {
   comparisonFeatures,
   packageHasFeature,
   packageOrderHref,
+  type AddonId,
   type CatalogPackage,
   type PackageId,
   type PackageTone,
@@ -82,11 +82,13 @@ export function PackageCard({
   selected = false,
   onSelect,
   services = comparisonFeatures,
+  addonIds = [],
 }: {
   pkg: CatalogPackage;
   selected?: boolean;
   onSelect?: (id: PackageId) => void;
   services?: readonly { id: string; label: string }[];
+  addonIds?: AddonId[];
 }) {
   const theme = tones[pkg.tone] ?? tones.navy;
   const featured = Boolean(pkg.popular);
@@ -101,6 +103,7 @@ export function PackageCard({
         onSelect && "cursor-pointer",
       )}
       onClick={onSelect ? () => onSelect(pkg.id) : undefined}
+      suppressHydrationWarning
     >
       <header className="relative">
         <div className={cn("absolute inset-0 package-header-slant", theme.header)} />
@@ -150,23 +153,24 @@ export function PackageCard({
       <div className="flex flex-1 flex-col px-4 pb-5 pt-1 sm:px-6 sm:pb-6">
         <ul className="mb-4 space-y-2">
           {includedServices.map((feature) => (
-            <li key={feature.id} className="flex min-w-0 items-start gap-2.5">
+            <li key={feature.id} className="flex min-w-0 items-start gap-2.5" suppressHydrationWarning>
               <FeatureMark checkClass={theme.check} />
               <span className="min-w-0 break-words text-[13px] leading-snug text-ink">{feature.label}</span>
             </li>
           ))}
         </ul>
-        <Link
-          href={packageOrderHref(pkg.id)}
+        <a
+          href={packageOrderHref(pkg.id, addonIds)}
           onClick={(event) => event.stopPropagation()}
           className={cn(
             "mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-extrabold uppercase tracking-[0.12em] shadow-[0_10px_24px_rgba(2,6,23,0.28)] transition-colors",
             theme.button,
           )}
+          suppressHydrationWarning
         >
           <ShoppingBag className="size-4 shrink-0" strokeWidth={2.25} aria-hidden />
           Buy now
-        </Link>
+        </a>
       </div>
     </article>
   );
@@ -177,11 +181,13 @@ export function PackagePricingGrid({
   selectedId,
   onSelect,
   services,
+  addonIds = [],
 }: {
   items: CatalogPackage[];
   selectedId?: PackageId;
   onSelect?: (id: PackageId) => void;
   services?: readonly { id: string; label: string }[];
+  addonIds?: AddonId[];
 }) {
   return (
     <div className="grid w-full min-w-0 grid-cols-1 items-stretch gap-4 sm:gap-5 lg:grid-cols-4">
@@ -192,6 +198,7 @@ export function PackagePricingGrid({
           selected={selectedId === pkg.id}
           onSelect={onSelect}
           services={services}
+          addonIds={addonIds}
         />
       ))}
     </div>

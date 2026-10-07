@@ -20,6 +20,7 @@ const columns = [
       { href: "/auth/register/job-seeker", label: "Create Account" },
       { href: "/auth/login", label: "Sign In" },
       { href: "/cv-generator", label: "Build Your CV" },
+      { href: "/meetings", label: "Book a Session" },
     ],
   },
   {
@@ -34,8 +35,9 @@ const columns = [
   {
     title: "Support",
     links: [
-      { href: "/contact", label: "Contact Us" },
-      { href: "/faq", label: "FAQ" },
+    { href: "/contact", label: "Contact Us" },
+    { href: "/meetings", label: "Book a Session" },
+    { href: "/faq", label: "FAQ" },
       { href: "/privacy", label: "Privacy Policy" },
       { href: "/terms", label: "Terms & Conditions" },
     ],
@@ -48,7 +50,7 @@ export function Footer() {
       <div className="brand-bar" aria-hidden />
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
         <div>
-          <Link href="/" className="inline-flex rounded-lg bg-white px-2 py-1.5">
+          <Link href="/" className="inline-flex rounded-lg bg-white px-2 py-1.5" suppressHydrationWarning>
             <BrandLogo className="h-11 w-auto object-contain" />
           </Link>
           <h2 className="mt-4 text-base font-bold text-accent">Creative-CV</h2>

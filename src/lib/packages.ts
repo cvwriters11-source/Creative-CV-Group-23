@@ -408,9 +408,16 @@ export function getPackage(id: string) {
   return packages.find((item) => item.id === id);
 }
 
-export function packageOrderHref(id: PackageId, addonIds: AddonId[] = []) {
+export function packageOrderHref(
+  id: PackageId,
+  addonIds: AddonId[] = [],
+  design?: { template?: string; color?: string; step?: "template" | "colour" | "details" },
+) {
   const params = new URLSearchParams({ package: id });
   if (addonIds.length) params.set("addons", addonIds.join(","));
+  if (design?.template) params.set("template", design.template);
+  if (design?.color) params.set("color", design.color);
+  if (design?.step) params.set("step", design.step);
   return `/packages/order?${params.toString()}`;
 }
 

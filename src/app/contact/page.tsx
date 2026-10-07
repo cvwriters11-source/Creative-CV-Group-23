@@ -1,5 +1,5 @@
 import { ContactForm } from "@/components/contact/contact-form";
-import { PageIntro } from "@/components/ui/primitives";
+import { ButtonLink, PageIntro } from "@/components/ui/primitives";
 import { site } from "@/lib/site";
 
 export default function ContactPage() {
@@ -38,6 +38,9 @@ export default function ContactPage() {
           Fast Response Time. We typically respond to all inquiries within 24 hours. Our experienced professionals are
           dedicated to helping you succeed in your career journey.
         </p>
+        <ButtonLink href="/meetings" variant="outlineLight" className="mt-8">
+          Book a Session
+        </ButtonLink>
       </div>
       <ContactForm />
     </div>

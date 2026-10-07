@@ -5,7 +5,7 @@ import { getResolvedCatalog, getResolvedPackageServices } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Complete your order",
-  description: "Enter your name, phone, email, and upload your picture and CV to order a Creative CV package.",
+  description: "Enter your details, complete a short career assessment, then pay for your Creative CV package.",
 };
 
 export const dynamic = "force-dynamic";

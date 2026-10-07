@@ -120,6 +120,14 @@ export async function resolveJobLogo(jobId: string, originalName?: string) {
   return resolveOrderUpload(`jobs/${jobId}`, "logo", originalName);
 }
 
+export async function saveTeamUpload(orderNumber: string, storedName: string, file: File) {
+  return saveNamedOrderUpload(`team/${safeUploadName(orderNumber)}`, storedName, file);
+}
+
+export async function resolveTeamUpload(orderNumber: string, storedName: string) {
+  return resolveStoredUpload(`team/${safeUploadName(orderNumber)}`, storedName);
+}
+
 export async function resolveStoredUpload(reference: string, storedName?: string) {
   if (!reference || !storedName) return null;
   if (reference.includes("..") || storedName.includes("..") || /[\\/]/.test(reference) || /[\\/]/.test(storedName)) {

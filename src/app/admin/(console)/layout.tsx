@@ -13,10 +13,11 @@ export default async function AdminConsoleLayout({ children }: { children: React
   const pendingCount = store.orders.filter(
     (order) => order.status === "received" || order.status === "pending_payment",
   ).length;
+  const meetingPendingCount = (store.meetings ?? []).filter((meeting) => meeting.status === "pending").length;
 
   return (
     <div className="admin-ops flex min-h-screen w-full min-w-0 flex-col overflow-x-hidden lg:flex-row">
-      <AdminSidebar email={session.email} pendingCount={pendingCount} />
+      <AdminSidebar email={session.email} pendingCount={pendingCount} meetingPendingCount={meetingPendingCount} />
       <div className="admin-main flex min-w-0 flex-1 flex-col">
         <AdminTopbar />
         <div className="min-w-0 flex-1 px-4 py-6 lg:px-8">{children}</div>

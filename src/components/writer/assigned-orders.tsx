@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { formatAdminDate, orderStatusLabels } from "@/lib/admin/format";
 import type { AdminOrder } from "@/lib/admin/types";
+import { ChosenCvPages } from "@/components/packages/cv-design-preview";
+import { formatCvDesign } from "@/lib/cv-design";
 
 function FileLink({
   href,
@@ -53,11 +55,16 @@ function WriterOrderCard({ order }: { order: AdminOrder }) {
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">{order.orderNumber}</p>
           <h2 className="mt-1 text-lg font-semibold text-white">{order.fullName}</h2>
           <p className="text-sm text-slate-300">{order.packageName}</p>
+          {formatCvDesign(order.cvTemplate, order.cvColor) ? (
+            <p className="mt-1 text-xs font-semibold text-accent">Look: {formatCvDesign(order.cvTemplate, order.cvColor)}</p>
+          ) : null}
         </div>
         <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
           {order.status === "complete" ? "Complete" : statusLabel}
         </span>
       </div>
+
+      <ChosenCvPages color={order.cvColor} template={order.cvTemplate} size="compact" className="mt-4" />
 
       {order.goals ? <p className="mt-3 text-sm text-slate-300">Brief: {order.goals}</p> : null}
 

@@ -11,7 +11,38 @@ export type OrderStatus =
   | "complete";
 export type ContactStatus = "new" | "read" | "replied";
 export type GeneratorEventType = "pay_attempt" | "draft_complete" | "verify";
-export type ActivityType = "order" | "contact" | "application" | "job" | "user" | "generator" | "writer";
+export type ActivityType = "order" | "contact" | "application" | "job" | "user" | "generator" | "writer" | "meeting";
+export type TeamRole = "admin" | "writer";
+
+export type TeamChatMessage = {
+  id: string;
+  body: string;
+  authorName: string;
+  authorEmail: string;
+  authorRole: TeamRole;
+  createdAt: string;
+};
+
+export type TeamFileVersion = {
+  id: string;
+  version: number;
+  fileName: string;
+  storedName: string;
+  size: number;
+  uploadedByName: string;
+  uploadedByEmail: string;
+  uploadedByRole: TeamRole;
+  createdAt: string;
+};
+
+export type TeamFileGroup = {
+  id: string;
+  orderNumber: string;
+  orderId?: string;
+  label: string;
+  versions: TeamFileVersion[];
+};
+export type MeetingStatus = "pending" | "approved" | "declined";
 export type JobSource = "seed" | "admin" | "recruiter";
 
 export type OrderCorrection = {
@@ -35,6 +66,8 @@ export type AdminOrder = {
   packageId: string;
   packageName: string;
   addonNames: string;
+  cvTemplate?: string;
+  cvColor?: string;
   amount: number;
   status: OrderStatus;
   goals: string;
@@ -70,6 +103,22 @@ export type AdminContact = {
   message: string;
   status: ContactStatus;
   createdAt: string;
+};
+
+export type AdminMeeting = {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  topic: string;
+  preferredDate: string;
+  preferredTime: string;
+  notes: string;
+  status: MeetingStatus;
+  teamsUrl?: string;
+  adminNote?: string;
+  createdAt: string;
+  decidedAt?: string;
 };
 
 export type AdminApplication = {
@@ -132,6 +181,7 @@ export type PackageService = {
 export type AdminStore = {
   orders: AdminOrder[];
   contacts: AdminContact[];
+  meetings: AdminMeeting[];
   applications: AdminApplication[];
   jobs: AdminJob[];
   unpublishedJobIds: string[];
@@ -139,6 +189,8 @@ export type AdminStore = {
   writers: AdminWriter[];
   generatorEvents: GeneratorEvent[];
   activity: ActivityItem[];
+  teamChat?: TeamChatMessage[];
+  teamFiles?: TeamFileGroup[];
   packageServices?: PackageService[];
   packageServiceMap?: Record<string, string[]>;
   packageMeta?: Record<string, PackageTurnaround>;

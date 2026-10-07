@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import type { AdminOrder, AdminWriter } from "@/lib/admin/types";
+import type { AdminMeeting, AdminOrder, AdminWriter } from "@/lib/admin/types";
+import { formatPreferredSlot, meetingTopicLabels, type MeetingTopic } from "@/lib/meetings";
+import { formatCvDesign } from "@/lib/cv-design";
 import { sendTransactionalEmail } from "@/lib/email";
 import { site } from "@/lib/site";
 import { resolveOrderUpload } from "@/lib/uploads";
@@ -19,7 +21,8 @@ export async function emailWriterAssigned(order: AdminOrder, writer: AdminWriter
       `Hi ${writer.name},`,
       "",
       `You have been assigned ${order.fullName}'s ${order.packageName} order (${order.orderNumber}).`,
-      "Sign in to your writer dashboard to view the brief and source files:",
+      `Chosen CV: ${formatCvDesign(order.cvTemplate, order.cvColor) || "Not specified"}. Follow this look exactly.`,
+      "Sign in to your writer dashboard to view the brief, the chosen CV pages, and source files:",
       writerLoginUrl(),
       "",
       "You will only see work assigned to you — not the admin dashboard.",
@@ -80,6 +83,71 @@ export async function emailWriterCorrections(order: AdminOrder, writer: AdminWri
       "",
       "Open your writer dashboard to update the CV and mark it for review again:",
       writerLoginUrl(),
+    ].join("\n"),
+  });
+}
+
+function meetingTopicLabel(topic: string) {
+  return meetingTopicLabels[topic as MeetingTopic] ?? topic;
+}
+
+export async function emailAdminNewMeeting(meeting: AdminMeeting) {
+  return sendTransactionalEmail({
+    to: adminInbox,
+    subject: `Teams meeting request from ${meeting.fullName}`,
+    text: [
+      `${meeting.fullName} asked to register for a Microsoft Teams meeting.`,
+      "",
+      `Email: ${meeting.email}`,
+      `Phone: ${meeting.phone}`,
+      `Topic: ${meetingTopicLabel(meeting.topic)}`,
+      `Preferred slot: ${formatPreferredSlot(meeting.preferredDate, meeting.preferredTime)}`,
+      meeting.notes ? `Notes: ${meeting.notes}` : "",
+      "",
+      "Approve or decline in admin:",
+      `${site.url.replace(/\/$/, "")}/admin/meetings`,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  });
+}
+
+export async function emailClientMeetingApproved(meeting: AdminMeeting) {
+  return sendTransactionalEmail({
+    to: meeting.email,
+    subject: "Your Creative CV Teams meeting is confirmed",
+    text: [
+      `Hi ${meeting.fullName},`,
+      "",
+      "Your Microsoft Teams meeting with Creative CV has been approved.",
+      `Topic: ${meetingTopicLabel(meeting.topic)}`,
+      `Requested slot: ${formatPreferredSlot(meeting.preferredDate, meeting.preferredTime)}`,
+      meeting.teamsUrl ? `Join link: ${meeting.teamsUrl}` : "",
+      meeting.adminNote ? `Note from our team: ${meeting.adminNote}` : "",
+      "",
+      `If you need to reschedule, call ${site.phone} or email ${site.email}.`,
+      "",
+      "Creative CV",
+    ]
+      .filter((line, index, lines) => line !== "" || lines[index - 1] !== "")
+      .join("\n"),
+  });
+}
+
+export async function emailClientMeetingDeclined(meeting: AdminMeeting) {
+  return sendTransactionalEmail({
+    to: meeting.email,
+    subject: "Update on your Creative CV Teams meeting request",
+    text: [
+      `Hi ${meeting.fullName},`,
+      "",
+      "We could not approve this Microsoft Teams meeting request.",
+      meeting.adminNote ? `Reason: ${meeting.adminNote}` : "Please reply to this email or call us to find another time.",
+      "",
+      `Phone: ${site.phone}`,
+      `Email: ${site.email}`,
+      "",
+      "Creative CV",
     ].join("\n"),
   });
 }

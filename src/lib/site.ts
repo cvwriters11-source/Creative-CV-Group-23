@@ -24,6 +24,7 @@ export const nav = [
   { href: "/jobs", label: "Find Jobs" },
   { href: "/cv-generator", label: "ATS Tester" },
   { href: "/packages", label: "CV Packages" },
+  { href: "/meetings", label: "Book a Session" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;

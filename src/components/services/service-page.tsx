@@ -132,6 +132,9 @@ export function ServicePage({ slug }: { slug: string }) {
           <ButtonLink href={`/packages?addon=${service.addonId}`} variant="accent" className="mt-6 w-full">
             Add to an order
           </ButtonLink>
+          <ButtonLink href="/meetings" variant="outlineLight" className="mt-3 w-full">
+            Book a Session
+          </ButtonLink>
         </aside>
       </div>
     </div>

@@ -113,6 +113,7 @@ export function RecruitmentProcessVideo({
             active ? "opacity-100" : "opacity-0",
             reducedMotion ? "" : "transition-opacity duration-700",
           )}
+          suppressHydrationWarning
         />
       </div>
     );

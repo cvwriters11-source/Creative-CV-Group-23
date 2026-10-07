@@ -3,6 +3,8 @@ import { AdminOrderWorkflow } from "@/components/admin/order-workflow";
 import { formatAdminDate } from "@/lib/admin/format";
 import type { AdminOrder, PublicWriter } from "@/lib/admin/types";
 import { formatZar } from "@/lib/cn";
+import { ChosenCvPages } from "@/components/packages/cv-design-preview";
+import { formatCvDesign } from "@/lib/cv-design";
 import type { OrderUploadKind } from "@/lib/uploads";
 
 const ribbonTones: Record<string, string> = {
@@ -119,6 +121,9 @@ export function AdminOrderPlanCard({
           <p className="text-xs font-semibold text-accent">{order.orderNumber ?? `Ref ${order.reference}`}</p>
           <p className="mt-1 break-all text-xs text-slate-300">{order.email}</p>
           <p className="text-xs text-slate-300">{order.phone}</p>
+          {formatCvDesign(order.cvTemplate, order.cvColor) ? (
+            <p className="mt-1 text-xs font-semibold text-accent">{formatCvDesign(order.cvTemplate, order.cvColor)}</p>
+          ) : null}
         </div>
 
         <div className="min-w-0 flex-1">
@@ -147,6 +152,8 @@ export function AdminOrderPlanCard({
           />
         </div>
       </div>
+
+      <ChosenCvPages color={order.cvColor} template={order.cvTemplate} size="compact" className="mt-4" />
 
       <ul className="mt-4 flex flex-wrap gap-2">
         <FileChip orderId={order.id} kind="photo" fileName={order.photoFileName} />

@@ -15,23 +15,32 @@ import type {
   AdminContact,
   AdminJob,
   AdminOrder,
+  AdminMeeting,
   AdminStore,
   AdminUser,
   AdminWriter,
   ContactStatus,
   GeneratorEvent,
+  MeetingStatus,
   OrderCorrection,
   OrderStatus,
   PackageService,
   PublicWriter,
+  TeamChatMessage,
+  TeamFileGroup,
+  TeamFileVersion,
+  TeamRole,
 } from "@/lib/admin/types";
+import { isMeetingSlotBooked } from "@/lib/meetings";
 import { hashPassword } from "@/lib/passwords";
 import { loadPublicSite, pickLivePublicSlice, publishPublicSite } from "@/lib/admin/public-site";
 import { revalidatePublicSite } from "@/lib/admin/revalidate-public";
+import { formatCvDesign } from "@/lib/cv-design";
 
 const emptyStore = (): AdminStore => ({
   orders: [],
   contacts: [],
+  meetings: [],
   applications: [],
   jobs: [],
   unpublishedJobIds: [],
@@ -39,6 +48,8 @@ const emptyStore = (): AdminStore => ({
   writers: [],
   generatorEvents: [],
   activity: [],
+  teamChat: [],
+  teamFiles: [],
 });
 
 let writeChain: Promise<unknown> = Promise.resolve();
@@ -93,6 +104,7 @@ async function readFromDisk(): Promise<AdminStore> {
       ...parsed,
       orders: parsed.orders ?? [],
       contacts: parsed.contacts ?? [],
+      meetings: parsed.meetings ?? [],
       applications: parsed.applications ?? [],
       jobs: parsed.jobs ?? [],
       unpublishedJobIds: parsed.unpublishedJobIds ?? [],
@@ -100,6 +112,8 @@ async function readFromDisk(): Promise<AdminStore> {
       writers: parsed.writers ?? [],
       generatorEvents: parsed.generatorEvents ?? [],
       activity: parsed.activity ?? [],
+      teamChat: parsed.teamChat ?? [],
+      teamFiles: parsed.teamFiles ?? [],
       packageServices: parsed.packageServices,
       packageServiceMap: parsed.packageServiceMap,
       packageMeta: parsed.packageMeta,
@@ -224,7 +238,9 @@ export async function recordOrder(input: Omit<AdminOrder, "id" | "createdAt" | "
     pushActivity(store, {
       type: "order",
       title: "New package order",
-      detail: `${order.fullName} · ${order.packageName} · R${order.amount}`,
+      detail: [order.fullName, order.packageName, formatCvDesign(order.cvTemplate, order.cvColor), `R${order.amount}`]
+        .filter(Boolean)
+        .join(" · "),
       href: "/admin/orders",
     });
     return order;
@@ -386,6 +402,73 @@ export async function updateContactStatus(id: string, status: ContactStatus) {
     if (!contact) return null;
     contact.status = status;
     return contact;
+  });
+}
+
+export async function recordMeeting(input: {
+  fullName: string;
+  email: string;
+  phone: string;
+  topic: string;
+  preferredDate: string;
+  preferredTime: string;
+  notes?: string;
+}) {
+  return mutateAdminStore((store) => {
+    const meeting: AdminMeeting = {
+      id: crypto.randomUUID(),
+      fullName: input.fullName,
+      email: input.email,
+      phone: input.phone,
+      topic: input.topic,
+      preferredDate: input.preferredDate,
+      preferredTime: input.preferredTime,
+      notes: input.notes ?? "",
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    };
+    store.meetings.unshift(meeting);
+    pushActivity(store, {
+      type: "meeting",
+      title: "New Teams meeting request",
+      detail: `${meeting.fullName} · ${meeting.preferredDate} ${meeting.preferredTime}`.trim(),
+      href: "/admin/meetings",
+    });
+    return meeting;
+  });
+}
+
+export async function decideMeeting(input: {
+  id: string;
+  status: Extract<MeetingStatus, "approved" | "declined">;
+  teamsUrl?: string;
+  adminNote?: string;
+}) {
+  return mutateAdminStore((store) => {
+    const meeting = store.meetings.find((item) => item.id === input.id);
+    if (!meeting) return { error: "Meeting request not found.", status: 404 } as const;
+    if (
+      input.status === "approved" &&
+      isMeetingSlotBooked(store.meetings ?? [], meeting.preferredDate, meeting.preferredTime)
+    ) {
+      const alreadyThis = meeting.status === "approved";
+      if (!alreadyThis) {
+        return { error: "That date and time is already booked.", status: 409 } as const;
+      }
+    }
+    meeting.status = input.status;
+    meeting.decidedAt = new Date().toISOString();
+    meeting.adminNote = input.adminNote?.trim() || undefined;
+    if (input.status === "approved") {
+      meeting.teamsUrl = input.teamsUrl?.trim();
+    }
+    pushActivity(store, {
+      type: "meeting",
+      title: input.status === "approved" ? "Teams meeting approved" : "Teams meeting declined",
+      detail: `${meeting.fullName} · ${meeting.email}`,
+      href: "/admin/meetings",
+    });
+    return { meeting } as const;
   });
 }
 
@@ -593,4 +676,111 @@ export async function savePackageServiceCatalog(input: {
     if (input.meta) store.packageMeta = resolvedPackageMeta(input.meta);
     return { services: store.packageServices, map: store.packageServiceMap, meta: resolvedPackageMeta(store.packageMeta) };
   }, true);
+}
+
+export function listOrderNumberOptions(store: AdminStore) {
+  return store.orders.map((order) => ({
+    id: order.id,
+    orderNumber: order.orderNumber,
+    fullName: order.fullName,
+  }));
+}
+
+export async function addTeamChatMessage(input: {
+  body: string;
+  authorName: string;
+  authorEmail: string;
+  authorRole: TeamRole;
+}) {
+  const body = input.body.trim();
+  if (!body) return { error: "Write a message first." } as const;
+  if (body.length > 2000) return { error: "Keep messages under 2,000 characters." } as const;
+
+  return mutateAdminStore((store) => {
+    store.teamChat ??= [];
+    const message: TeamChatMessage = {
+      id: crypto.randomUUID(),
+      body,
+      authorName: input.authorName,
+      authorEmail: input.authorEmail,
+      authorRole: input.authorRole,
+      createdAt: new Date().toISOString(),
+    };
+    store.teamChat.push(message);
+    store.teamChat = store.teamChat.slice(-400);
+    return { message };
+  });
+}
+
+export async function addTeamFileVersion(input: {
+  orderNumber: string;
+  fileName: string;
+  storedName: string;
+  size: number;
+  uploadedByName: string;
+  uploadedByEmail: string;
+  uploadedByRole: TeamRole;
+  orderId?: string;
+}) {
+  const orderNumber = input.orderNumber.trim();
+  const fileName = input.fileName.trim();
+  if (!orderNumber) return { error: "Enter an order number." } as const;
+  if (!fileName) return { error: "Choose a file to upload." } as const;
+
+  return mutateAdminStore((store) => {
+    store.teamFiles ??= [];
+    const orderKey = orderNumber.toLowerCase();
+    const fileKey = fileName.toLowerCase();
+    const matchedOrder = store.orders.find((order) => order.orderNumber.trim().toLowerCase() === orderKey);
+    const canonicalNumber = matchedOrder?.orderNumber ?? orderNumber;
+    let group = store.teamFiles.find(
+      (item) => item.orderNumber.trim().toLowerCase() === orderKey && item.label.trim().toLowerCase() === fileKey,
+    );
+    if (!group) {
+      group = {
+        id: crypto.randomUUID(),
+        orderNumber: canonicalNumber,
+        orderId: matchedOrder?.id ?? input.orderId,
+        label: fileName,
+        versions: [],
+      };
+    } else {
+      group.orderNumber = canonicalNumber;
+      if (matchedOrder?.id) group.orderId = matchedOrder.id;
+    }
+    const version: TeamFileVersion = {
+      id: crypto.randomUUID(),
+      version: (group.versions.at(-1)?.version ?? 0) + 1,
+      fileName,
+      storedName: input.storedName,
+      size: input.size,
+      uploadedByName: input.uploadedByName,
+      uploadedByEmail: input.uploadedByEmail,
+      uploadedByRole: input.uploadedByRole,
+      createdAt: new Date().toISOString(),
+    };
+    group.versions.push(version);
+    store.teamFiles = [group, ...store.teamFiles.filter((item) => item.id !== group.id)];
+    return { group, version, matchedOrder: Boolean(matchedOrder) };
+  });
+}
+
+export function findTeamFileVersion(store: AdminStore, versionId: string) {
+  for (const group of store.teamFiles ?? []) {
+    const version = group.versions.find((item) => item.id === versionId);
+    if (version) return { group, version };
+  }
+  return null;
+}
+
+export function searchTeamFiles(store: AdminStore, query: string): TeamFileGroup[] {
+  const needle = query.trim().toLowerCase();
+  const files = store.teamFiles ?? [];
+  if (!needle) return files;
+  return files.filter(
+    (group) =>
+      group.orderNumber.toLowerCase().includes(needle) ||
+      group.label.toLowerCase().includes(needle) ||
+      group.versions.some((item) => item.uploadedByName.toLowerCase().includes(needle)),
+  );
 }

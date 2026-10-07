@@ -124,6 +124,7 @@ export function getDashboardMetrics(store: AdminStore) {
     reviewOrders: store.orders.filter((order) => order.status === "review"),
     correctionOrders: store.orders.filter((order) => order.status === "corrections"),
     completedOrders: store.orders.filter((order) => order.status === "complete").length,
+    pendingMeetings: (store.meetings ?? []).filter((meeting) => meeting.status === "pending"),
     totalCustomers: uniqueCustomers.size,
     writers: getWriterPerformance(store),
   };

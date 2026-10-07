@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { formatOpsZar, getDashboardMetrics } from "@/lib/admin/dashboard";
+import { formatCvDesign } from "@/lib/cv-design";
 import { readAdminStore } from "@/lib/admin/store";
 import { cn } from "@/lib/cn";
 
@@ -89,8 +90,39 @@ export default async function AdminOverviewPage() {
           hint={metrics.correctionOrders.length > 0 ? "Client changes waiting" : undefined}
         />
         <KpiCard label="Completed Orders" value={String(metrics.completedOrders)} icon={CheckCircle2} tone="green" />
+        <KpiCard
+          label="Pending meetings"
+          value={String(metrics.pendingMeetings.length)}
+          icon={Clock3}
+          tone="amber"
+          hint={metrics.pendingMeetings.length > 0 ? "Teams requests to approve" : undefined}
+        />
         <KpiCard label="Total Customers" value={String(metrics.totalCustomers)} icon={Users} tone="purple" />
       </div>
+
+      {metrics.pendingMeetings.length > 0 ? (
+        <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+          <div className="border-b border-slate-100 px-5 py-4">
+            <h2 className="text-base font-semibold text-slate-900">Teams meeting requests</h2>
+            <p className="mt-1 text-sm text-slate-500">Clients waiting for admin to approve a Microsoft Teams session.</p>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {metrics.pendingMeetings.map((meeting) => (
+              <li key={meeting.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+                <div>
+                  <p className="font-medium text-slate-900">{meeting.fullName}</p>
+                  <p className="text-xs text-slate-500">
+                    {meeting.preferredDate} {meeting.preferredTime} · {meeting.topic}
+                  </p>
+                </div>
+                <Link href="/admin/meetings" className="text-sm font-medium text-teal-600 hover:text-teal-700">
+                  Review
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {metrics.reviewOrders.length > 0 || metrics.correctionOrders.length > 0 ? (
         <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
@@ -107,6 +139,9 @@ export default async function AdminOverviewPage() {
                   </p>
                   <p className="text-xs text-slate-500">
                     {order.status === "review" ? "In review" : "Corrections"} · {order.packageName}
+                    {formatCvDesign(order.cvTemplate, order.cvColor)
+                      ? ` · ${formatCvDesign(order.cvTemplate, order.cvColor)}`
+                      : ""}
                   </p>
                 </div>
                 <Link href="/admin/orders" className="text-sm font-medium text-teal-600 hover:text-teal-700">

@@ -1,9 +1,13 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { CareerAssessment } from "@/components/packages/career-assessment";
 import { OrderSuccessPhone } from "@/components/packages/order-success-phone";
 import { formatZar } from "@/lib/cn";
+import { formatCareerAssessment, readCareerAssessment } from "@/lib/order-assessment";
 import { countryCallingCodes, defaultCountryDial } from "@/lib/phone-codes";
+import { ChosenCvPages } from "@/components/packages/cv-design-preview";
+import { formatCvDesign, type CvColorId, type CvTemplateId } from "@/lib/cv-design";
 import type { AddonId, PackageId } from "@/lib/packages";
 
 type Props = {
@@ -11,6 +15,8 @@ type Props = {
   addonIds: AddonId[];
   packageName: string;
   total: number;
+  cvTemplate: CvTemplateId;
+  cvColor: CvColorId;
 };
 
 function FileField({
@@ -48,16 +54,34 @@ function FileField({
   );
 }
 
-export function OrderForm({ packageId, addonIds, packageName, total }: Props) {
+export function OrderForm({ packageId, addonIds, packageName, total, cvTemplate, cvColor }: Props) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [step, setStep] = useState<"details" | "assessment">("details");
   const [status, setStatus] = useState<"idle" | "submitting" | "error" | "success" | "redirecting">("idle");
   const [message, setMessage] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
   const [customerName, setCustomerName] = useState("");
   const addonPayload = useMemo(() => JSON.stringify(addonIds), [addonIds]);
-  const closeSuccess = useCallback(() => setStatus("idle"), []);
+  const closeSuccess = useCallback(() => {
+    setStatus("idle");
+    setStep("details");
+  }, []);
+
+  function goToAssessment() {
+    const form = formRef.current;
+    if (!form) return;
+    if (!form.reportValidity()) return;
+    setMessage("");
+    setStep("assessment");
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (step !== "assessment") {
+      goToAssessment();
+      return;
+    }
     setStatus("submitting");
     setMessage("");
     const form = event.currentTarget;
@@ -65,6 +89,9 @@ export function OrderForm({ packageId, addonIds, packageName, total }: Props) {
     data.set("packageId", packageId);
     data.set("addonIds", addonPayload);
     data.set("amount", String(total));
+    data.set("cvTemplate", cvTemplate);
+    data.set("cvColor", cvColor);
+    data.set("goals", formatCareerAssessment(readCareerAssessment(data)));
     const firstName = String(data.get("firstName") ?? "").trim();
     const lastName = String(data.get("lastName") ?? "").trim();
     const submittedName = [firstName, lastName].filter(Boolean).join(" ");
@@ -98,12 +125,21 @@ export function OrderForm({ packageId, addonIds, packageName, total }: Props) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="card-surface bg-paper p-6 shadow-[0_20px_60px_rgba(6,20,40,0.08)] md:p-8">
-      <p className="kicker">Your details</p>
-      <h3 className="mt-2 font-serif text-2xl">{packageName}</h3>
-      <p className="mt-1 text-ink-soft">Total {formatZar(total)}</p>
+    <form
+      ref={formRef}
+      onSubmit={onSubmit}
+      className="card-surface bg-paper p-6 shadow-[0_20px_60px_rgba(6,20,40,0.08)] md:p-8"
+    >
+      <div className={step === "details" ? "" : "hidden"} hidden={step !== "details"} aria-hidden={step !== "details"}>
+        <p className="kicker">Your details</p>
+        <h3 className="mt-2 font-serif text-2xl">{packageName}</h3>
+        <p className="mt-1 text-ink-soft">Total {formatZar(total)}</p>
+        <p className="mt-1 text-sm text-ink-soft">Look: {formatCvDesign(cvTemplate, cvColor)}</p>
+        <input type="hidden" name="cvTemplate" value={cvTemplate} />
+        <input type="hidden" name="cvColor" value={cvColor} />
+        <ChosenCvPages color={cvColor} template={cvTemplate} tone="light" size="compact" className="mt-4" />
 
-      <div className="mt-6 grid gap-4">
+        <div className="mt-6 grid gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="grid gap-1 text-sm">
             Name
@@ -165,13 +201,23 @@ export function OrderForm({ packageId, addonIds, packageName, total }: Props) {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={status === "submitting" || status === "redirecting"}
-        className="mt-6 w-full rounded-full bg-accent py-3 text-sm font-bold uppercase tracking-[0.14em] text-on-accent hover:bg-accent-hover disabled:opacity-60"
-      >
-        {status === "submitting" ? "Submitting…" : status === "redirecting" ? "Redirecting to Paystack…" : "Continue to payment"}
-      </button>
+        <button
+          type="button"
+          onClick={goToAssessment}
+          className="mt-6 w-full rounded-full bg-accent py-3 text-sm font-bold uppercase tracking-[0.14em] text-on-accent hover:bg-accent-hover"
+        >
+          Continue to assessment
+        </button>
+      </div>
+
+      {step === "assessment" ? (
+        <CareerAssessment
+          onBack={() => setStep("details")}
+          submitting={status === "submitting"}
+          redirecting={status === "redirecting"}
+        />
+      ) : null}
+
       {message ? <p className="mt-4 text-sm leading-relaxed text-ink-soft">{message}</p> : null}
       {status === "success" && orderNumber ? (
         <OrderSuccessPhone orderNumber={orderNumber} customerName={customerName} onClose={closeSuccess} />

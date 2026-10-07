@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { recordOrder } from "@/lib/admin/store";
 import { getResolvedCatalog } from "@/lib/catalog";
+import { formatCvDesign, parseCvColor, parseCvTemplate } from "@/lib/cv-design";
 import { addons, type AddonId } from "@/lib/packages";
 import { sendTransactionalEmail } from "@/lib/email";
 import { initializePaystack, isPaystackConfigured } from "@/lib/paystack";
@@ -25,6 +26,8 @@ export async function POST(request: Request) {
   const packageId = String(form.get("packageId") ?? "");
   const amount = Number(form.get("amount") ?? 0);
   const addonIds = JSON.parse(String(form.get("addonIds") ?? "[]")) as AddonId[];
+  const cvTemplate = parseCvTemplate(form.get("cvTemplate"));
+  const cvColor = parseCvColor(form.get("cvColor"));
   const photo = form.get("photo");
   const cv = form.get("cv");
   const extra = form.get("extra");
@@ -37,6 +40,9 @@ export async function POST(request: Request) {
 
   if (!fullName || !email || !nationalPhone || !pkg) {
     return NextResponse.json({ error: "Please complete the required order fields." }, { status: 400 });
+  }
+  if (!cvTemplate || !cvColor) {
+    return NextResponse.json({ error: "Please choose a CV template and colour." }, { status: 400 });
   }
   if (!isKnownDialCode(countryCode)) {
     return NextResponse.json({ error: "Please choose a valid country code." }, { status: 400 });
@@ -78,6 +84,8 @@ export async function POST(request: Request) {
     packageId: pkg.id,
     packageName: pkg.name,
     addonNames: addonNames || "None",
+    cvTemplate,
+    cvColor,
     amount,
     status: paymentConfigured ? "pending_payment" : "received",
     goals,
@@ -94,6 +102,7 @@ export async function POST(request: Request) {
     `Email: ${email}`,
     `Phone: ${phone}`,
     `Package: ${pkg.name} (R${pkg.price})`,
+    `Look: ${formatCvDesign(cvTemplate, cvColor)}`,
     `Add-ons: ${addonNames || "None"}`,
     `Amount: R${amount}`,
     `Picture: ${photoFileName}`,
@@ -125,7 +134,14 @@ export async function POST(request: Request) {
     amountZar: amount,
     reference,
     callbackUrl: `${origin}/packages/order?paid=${reference}`,
-    metadata: { packageId, fullName, orderNumber: order.orderNumber },
+    metadata: {
+      packageId,
+      fullName,
+      orderNumber: order.orderNumber,
+      cvTemplate,
+      cvColor,
+      look: formatCvDesign(cvTemplate, cvColor),
+    },
   });
 
   return NextResponse.json({
