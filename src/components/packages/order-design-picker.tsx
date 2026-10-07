@@ -91,21 +91,21 @@ export function OrderDesignPicker({
       if (skipScrollSync.current) return;
       const bounds = root.getBoundingClientRect();
       const centerX = bounds.left + bounds.width / 2;
-      let best: CvColorId | null = null;
+      let nextColor: CvColorId | undefined;
       let dist = Infinity;
       root.querySelectorAll<HTMLElement>("[data-color]").forEach((el) => {
         const id = el.dataset.color;
-        if (!isCvColorId(id ?? "")) return;
+        if (!id || !isCvColorId(id)) return;
         const rect = el.getBoundingClientRect();
         const gap = Math.abs(rect.left + rect.width / 2 - centerX);
         if (gap < dist) {
           dist = gap;
-          best = id as CvColorId;
+          nextColor = id;
         }
       });
-      if (isCvColorId(best ?? "")) {
-        const nextColor = best as CvColorId;
-        setColor((current) => (current === nextColor ? current : nextColor));
+      if (nextColor) {
+        const selected = nextColor;
+        setColor((current) => (current === selected ? current : selected));
       }
     };
     const onScroll = () => {
