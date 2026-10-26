@@ -2,8 +2,8 @@ import { cn } from "@/lib/cn";
 import {
   cvColorLabel,
   cvColorMeta,
+  cvLookForPackage,
   formatCvDesign,
-  graduatePdfPages,
   graduatePreviewSrc,
   isCvColorId,
   sampleCvPreview,
@@ -15,13 +15,16 @@ type Size = "card" | "stage" | "document";
 
 export function GraduatePdfPreview({
   color,
+  packageId,
   className,
 }: {
   color: CvColorId;
+  packageId?: string;
   className?: string;
 }) {
+  const look = cvLookForPackage(packageId);
   const label = cvColorLabel(color);
-  const total = graduatePdfPages.length;
+  const total = look.pages.length;
 
   return (
     <div
@@ -31,11 +34,11 @@ export function GraduatePdfPreview({
       )}
     >
       <div className="space-y-3">
-        {graduatePdfPages.map((page) => (
+        {look.pages.map((page) => (
           <figure key={page} className="overflow-hidden bg-white shadow-[0_8px_20px_rgba(15,23,42,0.18)]">
             <img
-              src={graduatePreviewSrc(page, color)}
-              alt={`${label} International Resume, page ${page} of ${total}`}
+              src={graduatePreviewSrc(page, color, packageId)}
+              alt={`${label} ${look.name} CV, page ${page} of ${total}`}
               className="block w-full"
               suppressHydrationWarning
             />
@@ -52,20 +55,23 @@ export function GraduatePdfPreview({
 export function ChosenCvPages({
   color,
   template,
+  packageId,
   className,
   tone = "admin",
   size = "compact",
 }: {
   color?: string;
   template?: string;
+  packageId?: string;
   className?: string;
   tone?: "admin" | "light";
   size?: "compact" | "full";
 }) {
   if (!isCvColorId(color ?? "")) return null;
   const id = color as CvColorId;
-  const label = formatCvDesign(template || "classic", id);
-  const total = graduatePdfPages.length;
+  const look = cvLookForPackage(packageId);
+  const label = formatCvDesign(template || "classic", id, packageId);
+  const total = look.pages.length;
   const light = tone === "light";
   const compact = size === "compact";
 
@@ -84,8 +90,8 @@ export function ChosenCvPages({
           {label} · {total} pages
         </p>
       </div>
-      <div className={cn("mt-2.5 flex flex-wrap gap-2.5", compact ? "items-start" : "grid sm:grid-cols-2")}>
-        {graduatePdfPages.map((page) => (
+      <div className={cn("mt-2.5 flex flex-wrap gap-2.5", compact ? "items-start" : "grid sm:grid-cols-3")}>
+        {look.pages.map((page) => (
           <figure
             key={page}
             className={cn(
@@ -94,7 +100,7 @@ export function ChosenCvPages({
             )}
           >
             <img
-              src={graduatePreviewSrc(page, id)}
+              src={graduatePreviewSrc(page, id, packageId)}
               alt={`${label}, page ${page} of ${total}`}
               className="block w-full"
             />

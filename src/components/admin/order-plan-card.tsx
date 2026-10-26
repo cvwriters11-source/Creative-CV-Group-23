@@ -121,8 +121,8 @@ export function AdminOrderPlanCard({
           <p className="text-xs font-semibold text-accent">{order.orderNumber ?? `Ref ${order.reference}`}</p>
           <p className="mt-1 break-all text-xs text-slate-300">{order.email}</p>
           <p className="text-xs text-slate-300">{order.phone}</p>
-          {formatCvDesign(order.cvTemplate, order.cvColor) ? (
-            <p className="mt-1 text-xs font-semibold text-accent">{formatCvDesign(order.cvTemplate, order.cvColor)}</p>
+          {formatCvDesign(order.cvTemplate, order.cvColor, order.packageId) ? (
+            <p className="mt-1 text-xs font-semibold text-accent">{formatCvDesign(order.cvTemplate, order.cvColor, order.packageId)}</p>
           ) : null}
         </div>
 
@@ -153,7 +153,7 @@ export function AdminOrderPlanCard({
         </div>
       </div>
 
-      <ChosenCvPages color={order.cvColor} template={order.cvTemplate} size="compact" className="mt-4" />
+      <ChosenCvPages color={order.cvColor} template={order.cvTemplate} packageId={order.packageId} size="compact" className="mt-4" />
 
       <ul className="mt-4 flex flex-wrap gap-2">
         <FileChip orderId={order.id} kind="photo" fileName={order.photoFileName} />

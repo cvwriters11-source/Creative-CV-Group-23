@@ -7,7 +7,7 @@ import { OrderDesignPicker } from "@/components/packages/order-design-picker";
 import { OrderForm } from "@/components/packages/order-form";
 import { PageIntro } from "@/components/ui/primitives";
 import { cn, formatZar } from "@/lib/cn";
-import { formatCvDesign, parseCvColor, parseCvTemplate } from "@/lib/cv-design";
+import { cvLookForPackage, formatCvDesign, parseCvColor, parseCvTemplate } from "@/lib/cv-design";
 import {
   addons,
   africaOnlyLabel,
@@ -63,7 +63,8 @@ export function OrderCheckout({
   const requestedStep = searchParams.get("step");
   const designStep: "colour" | "details" = requestedStep === "details" ? "details" : "colour";
   const paid = searchParams.get("paid");
-  const designLabel = formatCvDesign(cvTemplate ?? undefined, cvColor);
+  const look = cvLookForPackage(pkg.id);
+  const designLabel = formatCvDesign(cvTemplate ?? undefined, cvColor, pkg.id);
 
   const includedServices = useMemo(
     () => services.filter((feature) => pkg.features.includes(feature.id)),
@@ -108,7 +109,7 @@ export function OrderCheckout({
         title={designStep === "colour" ? "Choose the CV you want" : "Tell us who you are"}
         lede={
           designStep === "colour"
-            ? "Each sample is the full two-page International Resume PDF in a different colour. Scroll the pages, pick the one you want, then continue."
+            ? `Each sample is the full ${look.pages.length === 2 ? "two-page" : look.pages.length === 3 ? "three-page" : `${look.pages.length}-page`} ${look.name} PDF in a different colour. Scroll the pages, pick the one you want, then continue.`
             : "Fill in your details, upload your picture and CV, then complete a short career assessment. Payment comes after that."
         }
       />

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { GraduatePdfPreview } from "@/components/packages/cv-design-preview";
 import { cn } from "@/lib/cn";
-import { cvColors, isCvColorId, type CvColorId } from "@/lib/cv-design";
+import { cvColors, cvLookForPackage, isCvColorId, type CvColorId } from "@/lib/cv-design";
 import { packageOrderHref, type AddonId, type PackageId } from "@/lib/packages";
 
 function swatch(id: CvColorId, hex: string) {
@@ -34,6 +34,7 @@ export function OrderDesignPicker({
   const prev = cvColors[(index - 1 + cvColors.length) % cvColors.length];
   const next = cvColors[(index + 1) % cvColors.length];
   const selected = cvColors[index];
+  const look = cvLookForPackage(packageId);
 
   const colourHref = useCallback(
     (id: CvColorId) =>
@@ -123,7 +124,8 @@ export function OrderDesignPicker({
     <section className="mt-8 pb-20">
       <p className="kicker">Choose your CV</p>
       <p className="mt-3 max-w-2xl text-ink-soft">
-        Swipe the samples or tap one to select it. Scroll inside a sample to read both pages, then continue.
+        Swipe the samples or tap one to select it. Scroll inside a sample to read{" "}
+        {look.pages.length === 2 ? "both pages" : `all ${look.pages.length} pages`}, then continue.
       </p>
 
       <div className="mt-6">
@@ -144,7 +146,7 @@ export function OrderDesignPicker({
                 )}
               >
                 <div className="h-[min(62vh,36rem)] overflow-hidden rounded-md ring-1 ring-black/10">
-                  <GraduatePdfPreview color={item.id} />
+                  <GraduatePdfPreview color={item.id} packageId={packageId} />
                 </div>
                 <button
                   type="button"
@@ -251,7 +253,9 @@ export function OrderDesignPicker({
         >
           Continue with {selected.name}
         </a>
-        <p className="text-sm text-ink-soft">Selected CV: International · {selected.name} · 2 pages</p>
+        <p className="text-sm text-ink-soft">
+          Selected CV: {look.name} · {selected.name} · {look.pages.length} pages
+        </p>
       </div>
     </section>
   );

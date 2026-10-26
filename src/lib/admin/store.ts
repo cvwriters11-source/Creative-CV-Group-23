@@ -238,7 +238,7 @@ export async function recordOrder(input: Omit<AdminOrder, "id" | "createdAt" | "
     pushActivity(store, {
       type: "order",
       title: "New package order",
-      detail: [order.fullName, order.packageName, formatCvDesign(order.cvTemplate, order.cvColor), `R${order.amount}`]
+      detail: [order.fullName, order.packageName, formatCvDesign(order.cvTemplate, order.cvColor, order.packageId), `R${order.amount}`]
         .filter(Boolean)
         .join(" · "),
       href: "/admin/orders",

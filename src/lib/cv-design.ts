@@ -78,14 +78,31 @@ export function cvColorMeta(id: CvColorId) {
   return cvColors.find((item) => item.id === id) ?? cvColors[3];
 }
 
-export const graduatePdfPages = [1, 2] as const;
+export const graduatePdfPages = [1, 2, 3] as const;
 
-export function graduatePreviewSrc(page: (typeof graduatePdfPages)[number], color: CvColorId) {
-  return `/templates/international-resume_page_${page}_${color}.png`;
+export function cvLookForPackage(packageId?: string) {
+  if (packageId === "fresh-graduate") {
+    return { file: "graduate-cv", name: "Graduate", pages: [1, 2] as const };
+  }
+  if (packageId === "professional") {
+    return { file: "professional-cv", name: "Professional", pages: [1, 2] as const };
+  }
+  if (packageId === "executive") {
+    return { file: "executive-cv", name: "Executive", pages: [1, 2, 3] as const };
+  }
+  if (packageId === "cv-only") {
+    return { file: "graduate-cv", name: "CV Only", pages: [1, 2] as const };
+  }
+  return { file: "international-resume", name: "International", pages: [1, 2] as const };
 }
 
-export function formatCvDesign(templateId?: string, colorId?: string) {
-  const template = cvTemplateLabel(templateId);
+export function graduatePreviewSrc(page: number, color: CvColorId, packageId?: string) {
+  const look = cvLookForPackage(packageId);
+  return `/templates/${look.file}_page_${page}_${color}.png`;
+}
+
+export function formatCvDesign(templateId?: string, colorId?: string, packageId?: string) {
+  const template = packageId ? cvLookForPackage(packageId).name : cvTemplateLabel(templateId);
   const color = cvColorLabel(colorId);
   if (!template && !color) return "";
   if (!color) return template;

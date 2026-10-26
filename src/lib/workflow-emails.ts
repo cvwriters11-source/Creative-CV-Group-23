@@ -21,7 +21,7 @@ export async function emailWriterAssigned(order: AdminOrder, writer: AdminWriter
       `Hi ${writer.name},`,
       "",
       `You have been assigned ${order.fullName}'s ${order.packageName} order (${order.orderNumber}).`,
-      `Chosen CV: ${formatCvDesign(order.cvTemplate, order.cvColor) || "Not specified"}. Follow this look exactly.`,
+      `Chosen CV: ${formatCvDesign(order.cvTemplate, order.cvColor, order.packageId) || "Not specified"}. Follow this look exactly.`,
       "Sign in to your writer dashboard to view the brief, the chosen CV pages, and source files:",
       writerLoginUrl(),
       "",

@@ -55,8 +55,8 @@ function WriterOrderCard({ order }: { order: AdminOrder }) {
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">{order.orderNumber}</p>
           <h2 className="mt-1 text-lg font-semibold text-white">{order.fullName}</h2>
           <p className="text-sm text-slate-300">{order.packageName}</p>
-          {formatCvDesign(order.cvTemplate, order.cvColor) ? (
-            <p className="mt-1 text-xs font-semibold text-accent">Look: {formatCvDesign(order.cvTemplate, order.cvColor)}</p>
+          {formatCvDesign(order.cvTemplate, order.cvColor, order.packageId) ? (
+            <p className="mt-1 text-xs font-semibold text-accent">Look: {formatCvDesign(order.cvTemplate, order.cvColor, order.packageId)}</p>
           ) : null}
         </div>
         <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
@@ -64,7 +64,7 @@ function WriterOrderCard({ order }: { order: AdminOrder }) {
         </span>
       </div>
 
-      <ChosenCvPages color={order.cvColor} template={order.cvTemplate} size="compact" className="mt-4" />
+      <ChosenCvPages color={order.cvColor} template={order.cvTemplate} packageId={order.packageId} size="compact" className="mt-4" />
 
       {order.goals ? <p className="mt-3 text-sm text-slate-300">Brief: {order.goals}</p> : null}
 

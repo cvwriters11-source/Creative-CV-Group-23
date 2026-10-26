@@ -134,10 +134,10 @@ export function OrderForm({ packageId, addonIds, packageName, total, cvTemplate,
         <p className="kicker">Your details</p>
         <h3 className="mt-2 font-serif text-2xl">{packageName}</h3>
         <p className="mt-1 text-ink-soft">Total {formatZar(total)}</p>
-        <p className="mt-1 text-sm text-ink-soft">Look: {formatCvDesign(cvTemplate, cvColor)}</p>
+        <p className="mt-1 text-sm text-ink-soft">Look: {formatCvDesign(cvTemplate, cvColor, packageId)}</p>
         <input type="hidden" name="cvTemplate" value={cvTemplate} />
         <input type="hidden" name="cvColor" value={cvColor} />
-        <ChosenCvPages color={cvColor} template={cvTemplate} tone="light" size="compact" className="mt-4" />
+        <ChosenCvPages color={cvColor} template={cvTemplate} packageId={packageId} tone="light" size="compact" className="mt-4" />
 
         <div className="mt-6 grid gap-4">
         <div className="grid gap-4 sm:grid-cols-2">

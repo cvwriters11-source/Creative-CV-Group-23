@@ -102,7 +102,7 @@ export async function POST(request: Request) {
     `Email: ${email}`,
     `Phone: ${phone}`,
     `Package: ${pkg.name} (R${pkg.price})`,
-    `Look: ${formatCvDesign(cvTemplate, cvColor)}`,
+    `Look: ${formatCvDesign(cvTemplate, cvColor, pkg.id)}`,
     `Add-ons: ${addonNames || "None"}`,
     `Amount: R${amount}`,
     `Picture: ${photoFileName}`,
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
       orderNumber: order.orderNumber,
       cvTemplate,
       cvColor,
-      look: formatCvDesign(cvTemplate, cvColor),
+      look: formatCvDesign(cvTemplate, cvColor, pkg.id),
     },
   });
 

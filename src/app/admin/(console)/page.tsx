@@ -139,8 +139,8 @@ export default async function AdminOverviewPage() {
                   </p>
                   <p className="text-xs text-slate-500">
                     {order.status === "review" ? "In review" : "Corrections"} · {order.packageName}
-                    {formatCvDesign(order.cvTemplate, order.cvColor)
-                      ? ` · ${formatCvDesign(order.cvTemplate, order.cvColor)}`
+                    {formatCvDesign(order.cvTemplate, order.cvColor, order.packageId)
+                      ? ` · ${formatCvDesign(order.cvTemplate, order.cvColor, order.packageId)}`
                       : ""}
                   </p>
                 </div>
