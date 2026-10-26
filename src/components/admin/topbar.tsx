@@ -7,6 +7,7 @@ const titles: Array<{ match: (path: string) => boolean; title: string }> = [
   { match: (path) => path.startsWith("/admin/orders"), title: "Orders" },
   { match: (path) => path.startsWith("/admin/chat"), title: "Team chat" },
   { match: (path) => path.startsWith("/admin/storage"), title: "Storage" },
+  { match: (path) => path.startsWith("/admin/terms"), title: "Terms and Conditions" },
   { match: (path) => path.startsWith("/admin/meetings"), title: "Meetings" },
   { match: (path) => path.startsWith("/admin/customers") || path.startsWith("/admin/contacts"), title: "Customers" },
   { match: (path) => path.startsWith("/admin/recruiters"), title: "Recruiters" },

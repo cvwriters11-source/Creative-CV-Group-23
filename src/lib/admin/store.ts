@@ -31,6 +31,7 @@ import type {
   TeamFileVersion,
   TeamRole,
 } from "@/lib/admin/types";
+import { defaultTerms, normalizeTerms, type TermsContent } from "@/lib/legal/terms";
 import { isMeetingSlotBooked } from "@/lib/meetings";
 import { hashPassword } from "@/lib/passwords";
 import { loadPublicSite, pickLivePublicSlice, publishPublicSite } from "@/lib/admin/public-site";
@@ -50,6 +51,7 @@ const emptyStore = (): AdminStore => ({
   activity: [],
   teamChat: [],
   teamFiles: [],
+  terms: defaultTerms,
 });
 
 let writeChain: Promise<unknown> = Promise.resolve();
@@ -114,6 +116,7 @@ async function readFromDisk(): Promise<AdminStore> {
       activity: parsed.activity ?? [],
       teamChat: parsed.teamChat ?? [],
       teamFiles: parsed.teamFiles ?? [],
+      terms: parsed.terms ? normalizeTerms(parsed.terms) : defaultTerms,
       packageServices: parsed.packageServices,
       packageServiceMap: parsed.packageServiceMap,
       packageMeta: parsed.packageMeta,
@@ -762,6 +765,21 @@ export async function addTeamFileVersion(input: {
     group.versions.push(version);
     store.teamFiles = [group, ...store.teamFiles.filter((item) => item.id !== group.id)];
     return { group, version, matchedOrder: Boolean(matchedOrder) };
+  });
+}
+
+export async function getTermsContent() {
+  const store = await readAdminStore();
+  return normalizeTerms(store.terms);
+}
+
+export async function saveTermsContent(input: TermsContent) {
+  const terms = normalizeTerms(input);
+  if (!terms.sections.length) return { error: "Add at least one section." } as const;
+  if (!terms.title.trim()) return { error: "A title is required." } as const;
+  return mutateAdminStore((store) => {
+    store.terms = terms;
+    return { terms };
   });
 }
 

@@ -1,5 +1,6 @@
 import type { Job } from "@/lib/jobs";
 import type { PackageTurnaround } from "@/lib/packages";
+import type { TermsContent } from "@/lib/legal/terms";
 
 export type OrderStatus =
   | "received"
@@ -191,6 +192,7 @@ export type AdminStore = {
   activity: ActivityItem[];
   teamChat?: TeamChatMessage[];
   teamFiles?: TeamFileGroup[];
+  terms?: TermsContent;
   packageServices?: PackageService[];
   packageServiceMap?: Record<string, string[]>;
   packageMeta?: Record<string, PackageTurnaround>;
