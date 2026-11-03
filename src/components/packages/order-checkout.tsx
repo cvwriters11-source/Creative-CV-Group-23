@@ -12,6 +12,7 @@ import {
   addons,
   africaOnlyLabel,
   packageOrderHref,
+  packageServiceLines,
   type AddonId,
   type CatalogPackage,
   type PackageId,
@@ -66,10 +67,7 @@ export function OrderCheckout({
   const look = cvLookForPackage(pkg.id);
   const designLabel = formatCvDesign(cvTemplate ?? undefined, cvColor, pkg.id);
 
-  const includedServices = useMemo(
-    () => services.filter((feature) => pkg.features.includes(feature.id)),
-    [pkg.features, services],
-  );
+  const includedServices = useMemo(() => packageServiceLines(pkg, services), [pkg, services]);
   const selectedAddonItems = useMemo(
     () => addons.filter((addon) => selectedAddons.includes(addon.id)),
     [selectedAddons],

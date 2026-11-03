@@ -5,6 +5,7 @@ import {
   defaultPackageServiceMap,
   defaultPackageServices,
   defaultPackageTurnaroundMap,
+  mergePackageFeatureIds,
   normalizePackageTurnaround,
   packages,
   type PackageTurnaround,
@@ -663,7 +664,7 @@ export async function getPackageServiceCatalog() {
   const services = [...defaults, ...custom.filter((item) => item.custom)];
   const map = { ...defaultPackageServiceMap(), ...(live.packageServiceMap ?? {}) };
   for (const pkg of packages) {
-    if (!map[pkg.id]) map[pkg.id] = [...pkg.features];
+    map[pkg.id] = mergePackageFeatureIds(pkg.features, map[pkg.id]);
   }
   return { services, map, meta: resolvedPackageMeta(live.packageMeta) };
 }

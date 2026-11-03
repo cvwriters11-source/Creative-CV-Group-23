@@ -80,26 +80,20 @@ export function cvColorMeta(id: CvColorId) {
 
 export const graduatePdfPages = [1, 2, 3] as const;
 
-export type CvPackageLook = {
-  file: string;
-  name: string;
-  pages: readonly number[];
-};
-
-export function cvLookForPackage(packageId?: string): CvPackageLook {
+export function cvLookForPackage(packageId?: string) {
   if (packageId === "fresh-graduate") {
-    return { file: "graduate-cv", name: "Graduate", pages: [1, 2] };
+    return { file: "graduate-cv", name: "Graduate", pages: [1, 2] as const };
   }
   if (packageId === "professional") {
-    return { file: "professional-cv", name: "Professional", pages: [1, 2] };
+    return { file: "professional-cv", name: "Professional", pages: [1, 2] as const };
   }
   if (packageId === "executive") {
-    return { file: "executive-cv", name: "Executive", pages: [1, 2, 3] };
+    return { file: "executive-cv", name: "Executive", pages: [1, 2, 3] as const };
   }
   if (packageId === "cv-only") {
-    return { file: "graduate-cv", name: "CV Only", pages: [1, 2] };
+    return { file: "graduate-cv", name: "CV Only", pages: [1, 2] as const };
   }
-  return { file: "international-resume", name: "International", pages: [1, 2] };
+  return { file: "international-resume", name: "International", pages: [1, 2] as const };
 }
 
 export function graduatePreviewSrc(page: number, color: CvColorId, packageId?: string) {

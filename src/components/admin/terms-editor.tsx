@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { TermsDocument } from "@/components/legal/terms-document";
 import { formatTermsDate, type TermsContent, type TermsSection } from "@/lib/legal/terms";
 
@@ -196,9 +195,9 @@ export function TermsEditor({ initial }: { initial: TermsContent }) {
         </button>
         {dirty ? <p className="text-sm text-amber-300">Unsaved changes</p> : null}
         {message ? <p className="text-sm text-emerald-300">{message}</p> : null}
-        <Link href="/terms" target="_blank" className="text-sm font-semibold text-teal-300 hover:text-teal-200">
+        <a href="/terms" target="_blank" rel="noreferrer" className="text-sm font-semibold text-teal-300 hover:text-teal-200">
           View public page
-        </Link>
+        </a>
       </div>
 
       <div>

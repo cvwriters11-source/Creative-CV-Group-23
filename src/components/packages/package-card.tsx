@@ -5,8 +5,8 @@ import { cn } from "@/lib/cn";
 import {
   africaOnlyHeaderLabel,
   comparisonFeatures,
-  packageHasFeature,
   packageOrderHref,
+  packageServiceLines,
   type AddonId,
   type CatalogPackage,
   type PackageId,
@@ -92,7 +92,7 @@ export function PackageCard({
 }) {
   const theme = tones[pkg.tone] ?? tones.navy;
   const featured = Boolean(pkg.popular);
-  const includedServices = services.filter((feature) => packageHasFeature(pkg, feature.id));
+  const includedServices = packageServiceLines(pkg, services);
 
   return (
     <article
@@ -151,7 +151,7 @@ export function PackageCard({
       </header>
 
       <div className="flex flex-1 flex-col px-4 pb-5 pt-1 sm:px-6 sm:pb-6">
-        <ul className="mb-4 space-y-2">
+        <ul className="mb-4 min-w-0 space-y-2">
           {includedServices.map((feature) => (
             <li key={feature.id} className="flex min-w-0 items-start gap-2.5" suppressHydrationWarning>
               <FeatureMark checkClass={theme.check} />

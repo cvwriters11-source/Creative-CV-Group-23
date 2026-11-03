@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Briefcase,
@@ -77,7 +76,7 @@ export function AdminSidebar({
                 const active = isActivePath(pathname, item.href, item.aliases);
                 const Icon = item.icon;
                 return (
-                  <Link
+                  <a
                     key={item.href}
                     href={item.href}
                     aria-label={
@@ -106,7 +105,7 @@ export function AdminSidebar({
                         {meetingPendingCount > 99 ? "99+" : meetingPendingCount}
                       </span>
                     ) : null}
-                  </Link>
+                  </a>
                 );
               })}
             </div>

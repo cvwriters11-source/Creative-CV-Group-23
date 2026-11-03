@@ -3,7 +3,7 @@ import { PackagePricingGrid } from "@/components/packages/package-card";
 import { ButtonLink } from "@/components/ui/primitives";
 import { getResolvedPackageServices, getResolvedPrimaryPackages, getResolvedReturnPackages } from "@/lib/catalog";
 import { formatZar } from "@/lib/cn";
-import { africaOnlyLabel, addons, packageOrderHref } from "@/lib/packages";
+import { addons } from "@/lib/packages";
 
 export async function HomeCvPackages() {
   const items = await getResolvedPrimaryPackages();
@@ -37,29 +37,8 @@ export async function HomeCvPackages() {
           </ButtonLink>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {returnItems.map((pkg) => (
-            <Link
-              key={pkg.id}
-              href={packageOrderHref(pkg.id)}
-              className="rounded-2xl border border-accent/35 bg-paper-deep px-5 py-4 transition-colors hover:border-accent"
-            >
-              <div className="flex items-baseline justify-between gap-3">
-                <p className="font-medium">{pkg.name}</p>
-                <p className="text-right">
-                  {pkg.compareAtPrice ? (
-                    <span className="mr-2 text-sm text-ink-soft line-through">{formatZar(pkg.compareAtPrice)}</span>
-                  ) : null}
-                  <span className="font-serif text-lg font-bold">{formatZar(pkg.price)}</span>
-                </p>
-              </div>
-              {pkg.promotion ? <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-accent">{pkg.promotion}</p> : null}
-              <p className="mt-1 text-sm text-ink-soft">
-                {pkg.turnaroundLabel}
-                {pkg.africaOnly ? ` · ${africaOnlyLabel}` : ""}
-              </p>
-            </Link>
-          ))}
+        <div className="mt-6">
+          <PackagePricingGrid items={returnItems} services={services} />
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2">

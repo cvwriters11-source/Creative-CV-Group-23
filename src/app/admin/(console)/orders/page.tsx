@@ -1,6 +1,7 @@
 import { AdminOrderPlanCard } from "@/components/admin/order-plan-card";
 import { readAdminStore, toPublicWriter } from "@/lib/admin/store";
 import { getResolvedCatalog, getResolvedPackageServices } from "@/lib/catalog";
+import { packageServiceLines } from "@/lib/packages";
 
 export const metadata = { title: "Orders" };
 
@@ -26,9 +27,7 @@ export default async function AdminOrdersPage() {
         <div className="mt-8 grid gap-8">
           {store.orders.map((order) => {
             const pkg = catalog.find((item) => item.id === order.packageId);
-            const included = services
-              .filter((feature) => pkg?.features.includes(feature.id))
-              .map((feature) => feature.label);
+            const included = pkg ? packageServiceLines(pkg, services).map((feature) => feature.label) : [];
             return (
               <AdminOrderPlanCard
                 key={order.id}

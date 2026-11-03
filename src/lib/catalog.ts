@@ -1,6 +1,12 @@
 import { connection } from "next/server";
 import { getPackageServiceCatalog } from "@/lib/admin/store";
-import { applyPackageMeta, defaultPackageTurnaroundMap, packages, type CatalogPackage } from "@/lib/packages";
+import {
+  applyPackageMeta,
+  defaultPackageTurnaroundMap,
+  mergePackageFeatureIds,
+  packages,
+  type CatalogPackage,
+} from "@/lib/packages";
 
 export async function getResolvedCatalog(): Promise<CatalogPackage[]> {
   await connection();
@@ -10,7 +16,7 @@ export async function getResolvedCatalog(): Promise<CatalogPackage[]> {
     applyPackageMeta(
       {
         ...pkg,
-        features: map[pkg.id] ?? pkg.features,
+        features: mergePackageFeatureIds(pkg.features, map[pkg.id]),
       },
       meta[pkg.id] ?? defaults[pkg.id],
     ),

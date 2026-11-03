@@ -34,6 +34,13 @@ export const comparisonFeatures = [
   { id: "interviewPreparation", label: "Interview preparation" },
   { id: "coverLetterWriting", label: "Cover letter writing" },
   { id: "resumeDesign", label: "Résumé design" },
+  { id: "marketPositioning", label: "Market-specific positioning" },
+  { id: "internationalGuidance", label: "International job application guidance" },
+  { id: "leadershipPositioning", label: "Achievement and leadership positioning" },
+  { id: "standardEdit", label: "Standard edit of your existing CV" },
+  { id: "expressEdit", label: "Express edit of your existing CV" },
+  { id: "updatedKeywords", label: "Updated targeting and keywords" },
+  { id: "priorityScheduling", label: "Priority writer scheduling" },
 ] as const;
 
 export type ComparisonFeatureId = (typeof comparisonFeatures)[number]["id"];
@@ -127,12 +134,22 @@ export const packages: CatalogPackage[] = [
     summary:
       "Our most requested package. A specialist writer positions your experience for the next rung on your career ladder.",
     included: [
-      "Custom professional CV (no templates)",
-      "Industry-specific ATS optimisation",
+      "Professionally written CV",
+      "ATS-friendly formatting",
       "Word + PDF delivery",
-      "Turnaround time 4 working days",
       "Free tailored job alerts",
-      "Direct writer contact and 100% satisfaction guarantee",
+      "Satisfaction guarantee",
+      "Direct writer contact",
+      "Turnaround time 4 working days",
+      "Adding your email and résumé into recruiters database",
+      "Job application email template",
+      "Free career hunt techniques",
+      "Free salary negotiation template",
+      "Free help with job placements",
+      "Submitting your résumé and cover letter to potential recruiters and hiring managers",
+      "Interview preparation",
+      "Cover letter writing",
+      "Résumé design",
     ],
     popular: true,
     category: "core",
@@ -142,7 +159,7 @@ export const packages: CatalogPackage[] = [
     name: "Executive CV",
     headerName: "Executive",
     tone: "charcoal",
-    features: ["writtenCv", "ats", "wordPdf", "jobAlerts", "priorityTurnaround"],
+    features: ["writtenCv", "ats", "wordPdf", "jobAlerts", "priorityTurnaround", "leadershipPositioning"],
     price: 1500,
     turnaroundDays: 5,
     turnaroundLabel: "5 working days",
@@ -151,11 +168,12 @@ export const packages: CatalogPackage[] = [
     summary:
       "Leadership narrative, commercial impact, and a document that holds up in executive search and board processes.",
     included: [
-      "Executive-level CV written from scratch",
-      "Achievement and leadership positioning",
-      "Faster 5-day turnaround",
+      "Professionally written CV",
+      "ATS-friendly formatting",
       "Word + PDF delivery",
       "Free tailored job alerts",
+      "Priority turnaround",
+      "Achievement and leadership positioning",
     ],
     category: "core",
   },
@@ -164,7 +182,14 @@ export const packages: CatalogPackage[] = [
     name: "International Résumé",
     headerName: "International",
     tone: "ink",
-    features: ["writtenCv", "wordPdf", "priorityTurnaround", "internationalFormat"],
+    features: [
+      "writtenCv",
+      "wordPdf",
+      "priorityTurnaround",
+      "internationalFormat",
+      "marketPositioning",
+      "internationalGuidance",
+    ],
     price: 3000,
     turnaroundDays: 4,
     turnaroundLabel: "4 working days",
@@ -174,10 +199,11 @@ export const packages: CatalogPackage[] = [
     summary:
       "An internationally formatted résumé aligned to overseas hiring norms, with guidance for global applications.",
     included: [
-      "International résumé format",
-      "Market-specific positioning",
-      "4 working day turnaround",
+      "Professionally written CV",
       "Word + PDF delivery",
+      "Priority turnaround",
+      "International résumé",
+      "Market-specific positioning",
       "International job application guidance",
     ],
     category: "core",
@@ -208,7 +234,7 @@ export const packages: CatalogPackage[] = [
     name: "Return Client — Standard Edit",
     headerName: "Standard Edit",
     tone: "navy",
-    features: ["writtenCv", "ats", "wordPdf"],
+    features: ["standardEdit", "updatedKeywords", "wordPdf"],
     price: 750,
     turnaroundDays: 5,
     turnaroundLabel: "5 working days",
@@ -228,7 +254,7 @@ export const packages: CatalogPackage[] = [
     name: "Return Client — Express Edit",
     headerName: "Express Edit",
     tone: "charcoal",
-    features: ["writtenCv", "ats", "wordPdf", "priorityTurnaround"],
+    features: ["expressEdit", "priorityScheduling", "wordPdf"],
     price: 1000,
     turnaroundDays: 2,
     turnaroundLabel: "2 working days",
@@ -298,6 +324,38 @@ export const returnClientPackages = packages.filter((item) => item.category === 
 
 export function packageHasFeature(pkg: CatalogPackage, featureId: string) {
   return pkg.features.includes(featureId);
+}
+
+const builtInFeatureIds = new Set(comparisonFeatures.map((feature) => feature.id));
+
+/** Keep every catalog default, then append admin-only custom lines. */
+export function mergePackageFeatureIds(defaults: string[], override?: string[]) {
+  const merged: string[] = [];
+  const seen = new Set<string>();
+  for (const id of defaults) {
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    merged.push(id);
+  }
+  for (const id of override ?? []) {
+    if (!id || seen.has(id) || builtInFeatureIds.has(id)) continue;
+    seen.add(id);
+    merged.push(id);
+  }
+  return merged;
+}
+
+export function packageServiceLines(
+  pkg: CatalogPackage,
+  services: readonly { id: string; label: string }[] = comparisonFeatures,
+) {
+  const labels = new Map<string, string>();
+  for (const feature of comparisonFeatures) labels.set(feature.id, feature.label);
+  for (const feature of services) labels.set(feature.id, feature.label);
+  return pkg.features.flatMap((id) => {
+    const label = labels.get(id);
+    return label ? [{ id, label }] : [];
+  });
 }
 
 export type PackageMeta = {

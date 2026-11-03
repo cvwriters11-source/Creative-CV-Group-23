@@ -4,7 +4,6 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   addons,
-  africaOnlyLabel,
   getPackage,
   packageOrderHref,
   returnClientPackages,
@@ -109,32 +108,14 @@ function PackagesCatalog({
         <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8">
         <h2 className="heading-accent font-serif text-2xl">Already a client?</h2>
         <p className="mt-2 text-ink-soft">Return edits for an existing Creative CV.</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          {returnItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setSelected(item.id)}
-              className={cn(
-                "rounded-2xl border p-6 text-left transition-colors",
-                selected === item.id ? "border-accent bg-accent-soft/40" : "border-accent/35 bg-paper-deep hover:border-accent",
-              )}
-            >
-              <h3 className="font-serif text-xl">{item.name}</h3>
-              <p className="mt-2 font-serif text-2xl">
-                {item.compareAtPrice ? (
-                  <span className="mr-2 text-lg text-ink-soft line-through">{formatZar(item.compareAtPrice)}</span>
-                ) : null}
-                {formatZar(item.price)}
-              </p>
-              {item.promotion ? <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-accent">{item.promotion}</p> : null}
-              <p className="mt-2 text-sm text-ink-soft">
-                {item.turnaroundLabel}
-                {item.africaOnly ? ` · ${africaOnlyLabel}` : ""}
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-ink-soft">{item.audience}</p>
-            </button>
-          ))}
+        <div className="mt-6">
+          <PackagePricingGrid
+            items={returnItems}
+            selectedId={selected}
+            onSelect={setSelected}
+            services={services}
+            addonIds={selectedAddons}
+          />
         </div>
         </div>
       </section>
