@@ -326,7 +326,7 @@ export function packageHasFeature(pkg: CatalogPackage, featureId: string) {
   return pkg.features.includes(featureId);
 }
 
-const builtInFeatureIds = new Set(comparisonFeatures.map((feature) => feature.id));
+const builtInFeatureIds = new Set<string>(comparisonFeatures.map((feature) => feature.id));
 
 /** Keep every catalog default, then append admin-only custom lines. */
 export function mergePackageFeatureIds(defaults: string[], override?: string[]) {
